@@ -1,5 +1,9 @@
 ---
 title: "My Website"
+output:
+  html_document:
+    theme: cosmo
+    highlight: tango
 ---
 
 Hello, Website!
