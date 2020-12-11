@@ -420,8 +420,6 @@ Exploratory
 
 With the data fully cleaned, a more thorough review of the features and variables can begin. Since the visual story seeks to understand the how realistic the Basic Allowance for Housing (BAH) compensation is for service members assigned to the Washington, D.C. Metro area, the exploratory analysis will principally look at how the various features in the dataset effect the rental property's monthly price.
 
-{data-width=500}
------------------------------------------------------------------------
 #### <em> Cost Per Square-Foot </em>
 
 ```{r}
