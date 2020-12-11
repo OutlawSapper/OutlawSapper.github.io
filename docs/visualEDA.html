@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2020-10-23" />
+
+<title>Assignment 5: Visual EDA</title>
+
+<script src="site_libs/header-attrs-2.1/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Thomas Malejko</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    ANLY-503 Work
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="about503.html">About ANLY-503</a>
+    </li>
+    <li>
+      <a href="assignment1.html">Assignment 1</a>
+    </li>
+    <li>
+      <a href="assignment2.html">Assignment 2</a>
+    </li>
+    <li>
+      <a href="assignment3.html">Assignment 3</a>
+    </li>
+    <li class="dropdown-header">Assignment 4 (Not Included)</li>
+    <li>
+      <a href="visualEDA.html">Assignment 5</a>
+    </li>
+    <li>
+      <a href="geospatial.html">Assignment 6</a>
+    </li>
+    <li>
+      <a href="networks.html">Assignment 7</a>
+    </li>
+    <li class="dropdown-header">Project</li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Assignment 5: Visual EDA</h1>
+<h4 class="date">23 October 2020</h4>
+
+</div>
+
+
+<div id="section" class="section level2 tabset tabset-fade tabset-pills">
+<h2 class="tabset tabset-fade tabset-pills"></h2>
+<div id="task-1-explore-general-account-tendanciesr" class="section level3">
+<h3>Task 1 (Explore General Account Tendancies–<em>R</em>)</h3>
+<div id="load-packages-and-configure-global-settings-the-r-environment" class="section level4">
+<h4>Load Packages and Configure Global Settings the R Environment</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">## load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">library</span>(ggalluvial)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="co">## suppress scientific notation</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a><span class="kw">options</span>(<span class="dt">scipen=</span><span class="dv">999</span>)</span></code></pre></div>
+</div>
+<div id="load-inspect-the-required-data" class="section level4">
+<h4>Load &amp; Inspect the Required Data</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co">## load the data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>accountDF  &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/accounts_analytical.csv&#39;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>transactDF &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/transactions.csv&#39;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">## preview the account dataset</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="kw">head</span>(accountDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 64
+##    account_id acct_creation_d~ statement_frequ~ account_district num_customers
+##         &lt;dbl&gt; &lt;date&gt;           &lt;chr&gt;            &lt;chr&gt;                    &lt;dbl&gt;
+##  1          1 1995-03-24       monthly          Pisek                        1
+##  2          2 1993-02-26       monthly          Hl.m. Praha                  2
+##  3          3 1997-07-07       monthly          Kolin                        2
+##  4          4 1996-02-21       monthly          Pribram                      1
+##  5          5 1997-05-30       monthly          Cesky Krumlov                1
+##  6          6 1994-09-27       monthly          Trutnov                      1
+##  7          7 1996-11-24       monthly          Prostejov                    1
+##  8          8 1995-09-21       monthly          Hodonin                      2
+##  9          9 1993-01-27       monthly          Karvina                      1
+## 10         10 1996-08-28       monthly          Brno - mesto                 1
+## # ... with 59 more variables: credit_cards &lt;dbl&gt;, loan_date &lt;date&gt;,
+## #   loan_amount &lt;dbl&gt;, loan_payment &lt;dbl&gt;, loan_term &lt;dbl&gt;, loan_status &lt;chr&gt;,
+## #   loan_default &lt;lgl&gt;, max_withdrawal &lt;dbl&gt;, min_withdrawal &lt;dbl&gt;,
+## #   max_balance &lt;dbl&gt;, min_balance &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_other_avg_txn &lt;dbl&gt;, credit_cash_other_txn_ct &lt;dbl&gt;,
+## #   credit_cash_other_txn_tot &lt;dbl&gt;, credit_cash_other_avg_txn &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_ct &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_tot &lt;dbl&gt;,
+## #   credit_other_interest_credit_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_statement_charge_avg_txn &lt;dbl&gt;, debit_cash_other_txn_ct &lt;dbl&gt;,
+## #   debit_cash_other_txn_tot &lt;dbl&gt;, debit_cash_other_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_other_avg_txn &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_avg_txn &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_ct &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_tot &lt;dbl&gt;,
+## #   debit_credit_card_other_avg_txn &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_avg_txn &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_avg_txn &lt;dbl&gt;, pmt_order_ct &lt;dbl&gt;,
+## #   pmt_order_avg_amt &lt;dbl&gt;, owner_client_id &lt;dbl&gt;, gender &lt;chr&gt;,
+## #   birth_date &lt;date&gt;, owner_district &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co">## preview the transaction dataset</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">head</span>(transactDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 10
+##       id account_id date       type  amount balance bank  account method
+##    &lt;dbl&gt;      &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; 
+##  1     1          1 1995-03-24 cred~   1000    1000 &lt;NA&gt;  NA      cash  
+##  2     5          1 1995-04-13 cred~   3679    4679 AB     4.14e7 bank ~
+##  3     6          1 1995-05-13 cred~   3679   20977 AB     4.14e7 bank ~
+##  4     7          1 1995-06-13 cred~   3679   26835 AB     4.14e7 bank ~
+##  5     8          1 1995-07-13 cred~   3679   30415 AB     4.14e7 bank ~
+##  6     9          1 1995-08-13 cred~   3679   28903 AB     4.14e7 bank ~
+##  7    10          1 1995-09-13 cred~   3679   22714 AB     4.14e7 bank ~
+##  8    11          1 1995-10-13 cred~   3679   23318 AB     4.14e7 bank ~
+##  9    12          1 1995-11-13 cred~   3679   21721 AB     4.14e7 bank ~
+## 10    13          1 1995-12-13 cred~   3679   20249 AB     4.14e7 bank ~
+## # ... with 1 more variable: category &lt;chr&gt;</code></pre>
+</div>
+<div id="reduce-merge-transaction-data-into-account-data" class="section level4">
+<h4>Reduce &amp; Merge Transaction Data into Account Data</h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="co">## summarize the account balances by account id and merge that data to the </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">## account dataframe</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>accountDF &lt;-<span class="st"> </span>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(account_id, balance) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">meanBalance =</span> <span class="kw">mean</span>(balance)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>)</span></code></pre></div>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+</div>
+<div id="prepare-data-for-alluvial-plot" class="section level4">
+<h4>Prepare Data For Alluvial Plot</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co">## get account balance quantiles for prettier plotting</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>balanceQuant &lt;-<span class="st"> </span><span class="kw">cut_interval</span>(accountDF<span class="op">$</span>meanBalance, <span class="dv">5</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co">## give the labels a cleaner title, order, &amp; add to the dataframe</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>labConvert &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;[5.71e+03,2.08e+04]&quot;</span>  =<span class="st"> &#39;5th Quantile&#39;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>                 <span class="st">&quot;(2.08e+04,3.59e+04]&quot;</span> =<span class="st"> &#39;4th Quantile&#39;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>                 <span class="st">&quot;(3.59e+04,5.1e+04]&quot;</span>  =<span class="st"> &#39;3rd Quantile&#39;</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>                 <span class="st">&quot;(5.1e+04,6.61e+04]&quot;</span>  =<span class="st"> &#39;2nd Quantile&#39;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>                 <span class="st">&quot;(6.61e+04,8.12e+04]&quot;</span> =<span class="st"> &#39;1st Quantile&#39;</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>accountDF<span class="op">$</span>balanceQuant &lt;-<span class="st"> </span><span class="kw">ordered</span>(<span class="kw">recode</span>(balanceQuant, <span class="op">!!!</span>labConvert), </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>                                  <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&#39;1st Quantile&#39;</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true"></a>                                             <span class="st">&#39;2nd Quantile&#39;</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true"></a>                                             <span class="st">&#39;3rd Quantile&#39;</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true"></a>                                             <span class="st">&#39;4th Quantile&#39;</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true"></a>                                             <span class="st">&#39;5th Quantile&#39;</span>))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true"></a><span class="co">## generate new True/False columns for Credit Cards and Loans</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true"></a><span class="co">## &#39;TRUE&#39; if the account has had a credit card or loan associated with it</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true"></a><span class="co">## &#39;FALSE&#39; otherwise</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true"></a>accountDF<span class="op">$</span>creditTF &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="op">!</span><span class="kw">is.na</span>(accountDF<span class="op">$</span>credit_cards), <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true"></a>accountDF<span class="op">$</span>loanTF   &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="op">!</span><span class="kw">is.na</span>(accountDF<span class="op">$</span>loan_date), <span class="ot">TRUE</span>, <span class="ot">FALSE</span>)</span></code></pre></div>
+</div>
+<div id="construct-the-alluvial-plot" class="section level4">
+<h4>Construct the “Alluvial” Plot</h4>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="co">## generate the alluvial plot</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>accountDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="st">  </span><span class="co">## select only the three feature of interest</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(balanceQuant, creditTF, loanTF) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="st">  </span><span class="co">## count the accounts with these features</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(balanceQuant, creditTF, loanTF) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">freq =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="st">  </span><span class="co">## generate the plot</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">y =</span> freq, <span class="dt">axis1 =</span> creditTF, <span class="dt">axis2 =</span> loanTF, <span class="dt">axis3 =</span> balanceQuant)) <span class="op">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_alluvium</span>(<span class="kw">aes</span>(<span class="dt">fill =</span> creditTF), <span class="dt">width =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">12</span>) <span class="op">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_stratum</span>(<span class="dt">width =</span> <span class="dv">1</span><span class="op">/</span><span class="dv">12</span>, <span class="dt">fill =</span> <span class="st">&#39;darkslategrey&#39;</span>, <span class="dt">color =</span> <span class="st">&#39;grey&#39;</span>) <span class="op">+</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_label</span>(<span class="dt">stat =</span> <span class="st">&#39;stratum&#39;</span>, <span class="kw">aes</span>(<span class="dt">label =</span> <span class="kw">after_stat</span>(stratum))) <span class="op">+</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">limits =</span> <span class="kw">c</span>(<span class="st">&quot;Credit Card?&quot;</span>, <span class="st">&quot;Loan?&quot;</span>, </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a>                              <span class="st">&quot;Average</span><span class="ch">\n</span><span class="st">Account</span><span class="ch">\n</span><span class="st">Balance&quot;</span>),</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a>                   <span class="dt">expand =</span> <span class="kw">c</span>(<span class="fl">0.04</span>, <span class="fl">0.1</span>)) <span class="op">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">expand =</span> <span class="kw">c</span>(<span class="fl">0.02</span>, <span class="fl">0.02</span>)) <span class="op">+</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;grey69&quot;</span>, <span class="st">&quot;#003366&quot;</span>)) <span class="op">+</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">panel.border =</span> <span class="kw">element_blank</span>(), </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true"></a>        <span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>, </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true"></a>        <span class="dt">title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">14</span>, <span class="dt">color =</span> <span class="st">&#39;grey10&#39;</span>),</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true"></a>        <span class="dt">plot.subtitle =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">10</span>, <span class="dt">color =</span> <span class="st">&#39;grey10&#39;</span>, <span class="dt">hjust =</span> <span class="dv">0</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true"></a>                                     <span class="dt">margin =</span> <span class="kw">margin</span>(<span class="op">-</span><span class="dv">5</span>,<span class="dv">0</span>,<span class="dv">10</span>,<span class="dv">0</span>)),</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true"></a>        <span class="dt">axis.text =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">12</span>, <span class="dt">color =</span> <span class="st">&#39;grey10&#39;</span>)) <span class="op">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Mutually Exlusive...Credit Cards &amp; Loans?&#39;</span>, </span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;While &quot;credit card&quot; and &quot;loan&quot; history appear to have little</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true"></a><span class="st">relationship with the associated account balance, less than 1% of accounts have </span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true"></a><span class="st">both a &quot;credit card&quot; and a &quot;loan&quot; associated with it.&#39;</span>) <span class="op">+</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Number of Accounts&#39;</span>) <span class="op">+</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Account Condition&#39;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-2-1.png" width="960" style="display: block; margin: auto;" /> The figure above highlights several peculiar aspects of this dataset’s credit card, loan history, and account balance statistics. First, as is clearly visible in the figure, only 14% and 15% of accounts have a credit card or loan associated it, respectively. Of particular interest, only 39 accounts at this banking institution have both a credit card or loan associated with it, which is less than 1% of all accounts. A similar trend is that the average balance of accounts that possess a credit card is approximately similar to the average balance of accounts that have a loan history, except for the highest (1st Quantile) and lowest (5th Quantile) balance accounts. Interestingly, high-balance accounts at this institution are slightly more likely to have loan history than a credit card perhaps indicating that the bank’s credit cards do not offer industry-competitive perks that can only be obtained by high-earners (such as American Express). Conversely, low-balance accounts are less likely to have taken out a loan than they are to have a bank sponsored credit card.</p>
+</div>
+</div>
+<div id="task-2-understanding-loansr" class="section level3">
+<h3>Task 2 (Understanding Loans–<em>R</em>)</h3>
+<div id="load-packages-and-configure-global-settings-the-r-environment-1" class="section level4">
+<h4>Load Packages and Configure Global Settings the R Environment</h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="co">## load required packages</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="kw">library</span>(ggalluvial)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a><span class="co">## suppress scientific notation</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a><span class="kw">options</span>(<span class="dt">scipen=</span><span class="dv">999</span>)</span></code></pre></div>
+</div>
+<div id="load-inspect-the-required-data-1" class="section level4">
+<h4>Load &amp; Inspect the Required Data</h4>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="co">## load the data</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>accountDF  &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/accounts_analytical.csv&#39;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>transactDF &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/transactions.csv&#39;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="co">## preview the account dataset</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a><span class="kw">head</span>(accountDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 64
+##    account_id acct_creation_d~ statement_frequ~ account_district num_customers
+##         &lt;dbl&gt; &lt;date&gt;           &lt;chr&gt;            &lt;chr&gt;                    &lt;dbl&gt;
+##  1          1 1995-03-24       monthly          Pisek                        1
+##  2          2 1993-02-26       monthly          Hl.m. Praha                  2
+##  3          3 1997-07-07       monthly          Kolin                        2
+##  4          4 1996-02-21       monthly          Pribram                      1
+##  5          5 1997-05-30       monthly          Cesky Krumlov                1
+##  6          6 1994-09-27       monthly          Trutnov                      1
+##  7          7 1996-11-24       monthly          Prostejov                    1
+##  8          8 1995-09-21       monthly          Hodonin                      2
+##  9          9 1993-01-27       monthly          Karvina                      1
+## 10         10 1996-08-28       monthly          Brno - mesto                 1
+## # ... with 59 more variables: credit_cards &lt;dbl&gt;, loan_date &lt;date&gt;,
+## #   loan_amount &lt;dbl&gt;, loan_payment &lt;dbl&gt;, loan_term &lt;dbl&gt;, loan_status &lt;chr&gt;,
+## #   loan_default &lt;lgl&gt;, max_withdrawal &lt;dbl&gt;, min_withdrawal &lt;dbl&gt;,
+## #   max_balance &lt;dbl&gt;, min_balance &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_other_avg_txn &lt;dbl&gt;, credit_cash_other_txn_ct &lt;dbl&gt;,
+## #   credit_cash_other_txn_tot &lt;dbl&gt;, credit_cash_other_avg_txn &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_ct &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_tot &lt;dbl&gt;,
+## #   credit_other_interest_credit_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_statement_charge_avg_txn &lt;dbl&gt;, debit_cash_other_txn_ct &lt;dbl&gt;,
+## #   debit_cash_other_txn_tot &lt;dbl&gt;, debit_cash_other_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_other_avg_txn &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_avg_txn &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_ct &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_tot &lt;dbl&gt;,
+## #   debit_credit_card_other_avg_txn &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_avg_txn &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_avg_txn &lt;dbl&gt;, pmt_order_ct &lt;dbl&gt;,
+## #   pmt_order_avg_amt &lt;dbl&gt;, owner_client_id &lt;dbl&gt;, gender &lt;chr&gt;,
+## #   birth_date &lt;date&gt;, owner_district &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="co">## preview the transaction dataset</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="kw">head</span>(transactDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 10
+##       id account_id date       type  amount balance bank  account method
+##    &lt;dbl&gt;      &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; 
+##  1     1          1 1995-03-24 cred~   1000    1000 &lt;NA&gt;  NA      cash  
+##  2     5          1 1995-04-13 cred~   3679    4679 AB     4.14e7 bank ~
+##  3     6          1 1995-05-13 cred~   3679   20977 AB     4.14e7 bank ~
+##  4     7          1 1995-06-13 cred~   3679   26835 AB     4.14e7 bank ~
+##  5     8          1 1995-07-13 cred~   3679   30415 AB     4.14e7 bank ~
+##  6     9          1 1995-08-13 cred~   3679   28903 AB     4.14e7 bank ~
+##  7    10          1 1995-09-13 cred~   3679   22714 AB     4.14e7 bank ~
+##  8    11          1 1995-10-13 cred~   3679   23318 AB     4.14e7 bank ~
+##  9    12          1 1995-11-13 cred~   3679   21721 AB     4.14e7 bank ~
+## 10    13          1 1995-12-13 cred~   3679   20249 AB     4.14e7 bank ~
+## # ... with 1 more variable: category &lt;chr&gt;</code></pre>
+</div>
+<div id="reduce-merge-transaction-data-into-account-data-1" class="section level4">
+<h4>Reduce &amp; Merge Transaction Data into Account Data</h4>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="co">## summarize the account balances by account id and merge that data to the </span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="co">## account dataframe</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>accountDF &lt;-<span class="st"> </span>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(account_id, balance) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">meanBalance =</span> <span class="kw">mean</span>(balance)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>)</span></code></pre></div>
+</div>
+<div id="loan-status-review-active-v.-expired" class="section level4">
+<h4>Loan Status Review (Active v. Expired)</h4>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="co">## generate the plot</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>accountDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="st">  </span><span class="co">## retain only accounts that have a loan history</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(loan_date)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(loan_date, loan_amount, loan_payment, loan_term, loan_payment, loan_status, loan_default) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="st">  </span><span class="co">## convert loan_term to a factor (which is more appropriate for this plot)</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(loan_term), factor) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="st">  </span><span class="co">## generate the plot</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> loan_amount, <span class="dt">fill =</span> loan_status)) <span class="op">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins =</span> <span class="dv">30</span>, <span class="dt">color =</span> <span class="st">&#39;grey30&#39;</span>) <span class="op">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>)) <span class="op">+</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#1E4BC8&#39;</span>,<span class="st">&#39;grey69&#39;</span>), <span class="dt">name =</span> <span class="st">&#39;Loan Status?&#39;</span>) <span class="op">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">dollar_format</span>(), <span class="dt">expand =</span> <span class="kw">c</span>(.<span class="dv">02</span>, <span class="fl">.02</span>)) <span class="op">+</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">expand =</span> <span class="kw">c</span>(.<span class="dv">005</span>, <span class="fl">.005</span>)) <span class="op">+</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Frequency&#39;</span>) <span class="op">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Loan Amount (USD)&#39;</span>) <span class="op">+</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;A Comparison of Loan Amount History&#39;</span>,</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;The bank appears to issue loans (based on loan amount only) at approximately the</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a><span class="st">rate as they historically have.&#39;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/build-plot21-1.png" width="960" style="display: block; margin: auto;" /> The bank has more than $80 million issued in current loans (spread across 448 accounts) and has recovered more than $18.5 million from expired loans. Based on this analysis, the bank has lost more than $4 million on defaulted loans and is on pace to loose more than $11 million if all loans in current default expire without satisfactory resolution. That being said, it appears that the bank has not altered its loan issuing strategy from the perspective of loan quantities–that is the distribution of loan amounts is approximately similar for both current and expired loans.</p>
+<p>These two charts, taken together, indicate that this banking institution has assumed greater risk recently–especially for longer-term, higher-quantity loans than is likely advisable.</p>
+</div>
+<div id="understanding-loan-defaults" class="section level4">
+<h4>Understanding Loan Defaults</h4>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="co">## generate the plot</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>accountDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="st">  </span><span class="co">## retain only accounts with a loan history</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(loan_date)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(loan_date, loan_amount, loan_payment, loan_term, loan_payment, loan_status, loan_default) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a><span class="st">  </span><span class="co">## convert the loan term to a factor</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(loan_term), factor) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a><span class="st">  </span><span class="co">##create the plot</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> loan_term, <span class="dt">y =</span> loan_amount, <span class="dt">fill =</span> loan_default)) <span class="op">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">dollar_format</span>()) <span class="op">+</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>)) <span class="op">+</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#1E4BC8&#39;</span>,<span class="st">&#39;#C81E4B&#39;</span>), <span class="dt">name =</span> <span class="st">&#39;In Default?&#39;</span>) <span class="op">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Loan Amount (USD)&#39;</span>) <span class="op">+</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Loan Term (Months)&#39;</span>) <span class="op">+</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Inappropriate Assumption of Risk in Long-Term Loans&#39;</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;While the rate of loan default (as measured by term length) remains consistent around</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true"></a><span class="st">12% for loans in excess of 24 months, the average funds lost per default exceeds the </span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true"></a><span class="st">average loan amount for that same loan length.&#39;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/build-plot22-1.png" width="960" style="display: block; margin: auto;" /> Based on the above plot, this bank should relook its metrics for loan issuance for loans exceeding 12 months since the average funds lost per default greatly out-paces the average loan amount for loans with similar term-lengths. This indicidates that loan underwriters are assuming too much risk for long-term, large-quantity loans than is finacially prudent.</p>
+</div>
+</div>
+<div id="task-3-understanding-good-v.-bad-loansr" class="section level3">
+<h3>Task 3 (Understanding Good v. Bad Loans–<em>R</em>)</h3>
+<div id="load-packages-and-configure-global-settings-the-r-environment-2" class="section level4">
+<h4>Load Packages and Configure Global Settings the R Environment</h4>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="co">## load required packages</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="kw">library</span>(ggalluvial)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="co">## suppress scientific notation</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="kw">options</span>(<span class="dt">scipen=</span><span class="dv">999</span>)</span></code></pre></div>
+</div>
+<div id="load-inspect-the-required-data-2" class="section level4">
+<h4>Load &amp; Inspect the Required Data</h4>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="co">## load the data</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>accountDF  &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/accounts_analytical.csv&#39;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>transactDF &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/transactions.csv&#39;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a><span class="co">## preview the account dataset</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a><span class="kw">head</span>(accountDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 64
+##    account_id acct_creation_d~ statement_frequ~ account_district num_customers
+##         &lt;dbl&gt; &lt;date&gt;           &lt;chr&gt;            &lt;chr&gt;                    &lt;dbl&gt;
+##  1          1 1995-03-24       monthly          Pisek                        1
+##  2          2 1993-02-26       monthly          Hl.m. Praha                  2
+##  3          3 1997-07-07       monthly          Kolin                        2
+##  4          4 1996-02-21       monthly          Pribram                      1
+##  5          5 1997-05-30       monthly          Cesky Krumlov                1
+##  6          6 1994-09-27       monthly          Trutnov                      1
+##  7          7 1996-11-24       monthly          Prostejov                    1
+##  8          8 1995-09-21       monthly          Hodonin                      2
+##  9          9 1993-01-27       monthly          Karvina                      1
+## 10         10 1996-08-28       monthly          Brno - mesto                 1
+## # ... with 59 more variables: credit_cards &lt;dbl&gt;, loan_date &lt;date&gt;,
+## #   loan_amount &lt;dbl&gt;, loan_payment &lt;dbl&gt;, loan_term &lt;dbl&gt;, loan_status &lt;chr&gt;,
+## #   loan_default &lt;lgl&gt;, max_withdrawal &lt;dbl&gt;, min_withdrawal &lt;dbl&gt;,
+## #   max_balance &lt;dbl&gt;, min_balance &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_other_avg_txn &lt;dbl&gt;, credit_cash_other_txn_ct &lt;dbl&gt;,
+## #   credit_cash_other_txn_tot &lt;dbl&gt;, credit_cash_other_avg_txn &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_ct &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_tot &lt;dbl&gt;,
+## #   credit_other_interest_credit_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_statement_charge_avg_txn &lt;dbl&gt;, debit_cash_other_txn_ct &lt;dbl&gt;,
+## #   debit_cash_other_txn_tot &lt;dbl&gt;, debit_cash_other_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_other_avg_txn &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_avg_txn &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_ct &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_tot &lt;dbl&gt;,
+## #   debit_credit_card_other_avg_txn &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_avg_txn &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_avg_txn &lt;dbl&gt;, pmt_order_ct &lt;dbl&gt;,
+## #   pmt_order_avg_amt &lt;dbl&gt;, owner_client_id &lt;dbl&gt;, gender &lt;chr&gt;,
+## #   birth_date &lt;date&gt;, owner_district &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="co">## preview the transaction dataset</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="kw">head</span>(transactDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 10
+##       id account_id date       type  amount balance bank  account method
+##    &lt;dbl&gt;      &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; 
+##  1     1          1 1995-03-24 cred~   1000    1000 &lt;NA&gt;  NA      cash  
+##  2     5          1 1995-04-13 cred~   3679    4679 AB     4.14e7 bank ~
+##  3     6          1 1995-05-13 cred~   3679   20977 AB     4.14e7 bank ~
+##  4     7          1 1995-06-13 cred~   3679   26835 AB     4.14e7 bank ~
+##  5     8          1 1995-07-13 cred~   3679   30415 AB     4.14e7 bank ~
+##  6     9          1 1995-08-13 cred~   3679   28903 AB     4.14e7 bank ~
+##  7    10          1 1995-09-13 cred~   3679   22714 AB     4.14e7 bank ~
+##  8    11          1 1995-10-13 cred~   3679   23318 AB     4.14e7 bank ~
+##  9    12          1 1995-11-13 cred~   3679   21721 AB     4.14e7 bank ~
+## 10    13          1 1995-12-13 cred~   3679   20249 AB     4.14e7 bank ~
+## # ... with 1 more variable: category &lt;chr&gt;</code></pre>
+</div>
+<div id="reduce-merge-transaction-data-into-account-data-2" class="section level4">
+<h4>Reduce &amp; Merge Transaction Data into Account Data</h4>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="co">## summarize the account balances by account id and merge that data to the </span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="co">## account dataframe</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a>accountDF &lt;-<span class="st"> </span>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(account_id, balance) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">meanBalance =</span> <span class="kw">mean</span>(balance)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>)</span></code></pre></div>
+</div>
+<div id="loan-default-by-time-from-account-opening" class="section level4">
+<h4>Loan Default by Time From Account Opening</h4>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a><span class="co">## build the plot</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a>accountDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(acct_creation_date, loan_date, loan_default, loan_term) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true"></a><span class="st">  </span><span class="co">## retain only accounts with loan history</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(loan_date)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true"></a><span class="st">  </span><span class="co">## calculate the amount of time from account open to loan request</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">loan_delay =</span> loan_date<span class="op">-</span>acct_creation_date) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true"></a><span class="st">  </span><span class="co">## convert loan term to factor</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate_at</span>(<span class="kw">vars</span>(loan_term), factor) <span class="op">%&gt;%</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true"></a><span class="st">  </span><span class="co">## create the plot</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> loan_default, <span class="dt">y =</span> loan_delay, <span class="dt">fill =</span> loan_default)) <span class="op">+</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">notch =</span> <span class="ot">TRUE</span>, <span class="dt">notchwidth =</span> <span class="fl">.85</span>) <span class="op">+</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#1E4BC8&#39;</span>,<span class="st">&#39;#C81E4B&#39;</span>)) <span class="op">+</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">width =</span> <span class="fl">.27</span>, <span class="dt">fill =</span> <span class="st">&#39;grey20&#39;</span>, <span class="dt">color =</span> <span class="st">&#39;grey20&#39;</span>) <span class="op">+</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>), </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true"></a>        <span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>) <span class="op">+</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Time From Account Creation to Loan Request (Days)&#39;</span>) <span class="op">+</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Loan in Default?&#39;</span>) <span class="op">+</span></span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Account Created for Loan Only?&#39;</span>,</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;While some evidence suggests that loans requested shortly after account creation</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true"></a><span class="st">are at a higher risk of defaulting, the difference is insignificant.&#39;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-5-1.png" width="960" style="display: block; margin: auto;" /> While the average number of days between account creation and loan request is 40 days shorter for accounts that eventually default on a loan that difference is statistically insignificant. The more likely determinant of default is the loan amount. As seen in the plot below, the average amount of a loan that defaults is $205,002 compared to $144,689–a difference of $60,313 that is statistically significant.</p>
+</div>
+<div id="loan-default-by-loan-amount" class="section level4">
+<h4>Loan Default by Loan Amount</h4>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="co">## generate the plot</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a>accountDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(acct_creation_date, loan_date, loan_default, loan_term, loan_amount) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a><span class="st">  </span><span class="co">## retain only accounts with loan data</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(loan_date)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true"></a><span class="st">  </span><span class="co">## generate the plot</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> loan_default, <span class="dt">y =</span> loan_amount, <span class="dt">fill =</span> loan_default)) <span class="op">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">notch =</span> <span class="ot">TRUE</span>, <span class="dt">notchwidth =</span> <span class="fl">.85</span>) <span class="op">+</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#1E4BC8&#39;</span>,<span class="st">&#39;#C81E4B&#39;</span>)) <span class="op">+</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span><span class="kw">dollar_format</span>()) <span class="op">+</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>), </span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true"></a>        <span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>) <span class="op">+</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Loan Amount (USD)&#39;</span>) <span class="op">+</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Loan in Default?&#39;</span>) <span class="op">+</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;More Money, More Default Risk&#39;</span>,</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;There is more than a $60,000 difference between average loan amounts for accounts</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true"></a><span class="st">that satisfactorily repay a loan compared to those that eventually default.&#39;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-6-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="task-4-account-8261-visual-edapython" class="section level3">
+<h3>Task 4 (Account #8261 Visual EDA–<em>Python</em>)</h3>
+<div id="load-packages-and-configure-global-settings-the-r-environment-3" class="section level4">
+<h4>Load Packages and Configure Global Settings the R Environment</h4>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a><span class="co">## load python packages</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true"></a><span class="co">#import os as os</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true"></a><span class="co"># os.environ[&#39;QT_QPA_PLATFORM_PLUGIN_PATH&#39;] = C:/Users/armyk/Anaconda3/Library/plugins/platforms</span></span></code></pre></div>
+</div>
+<div id="load-inspect-the-required-data-3" class="section level4">
+<h4>Load &amp; Inspect the Required Data</h4>
+<div class="sourceCode" id="cb27"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a><span class="co">## load the dataframe and inspect its structure</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true"></a>transactDF <span class="op">=</span> pd.read_csv(<span class="vs">r&#39;data/transactions.csv&#39;</span>, low_memory <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true"></a><span class="bu">print</span>(transactDF.head(<span class="dv">10</span>))</span></code></pre></div>
+<pre><code>##    id  account_id        date    type  ...  bank     account         method  category
+## 0   1           1  1995-03-24  credit  ...   NaN         NaN           cash       NaN
+## 1   5           1  1995-04-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 2   6           1  1995-05-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 3   7           1  1995-06-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 4   8           1  1995-07-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 5   9           1  1995-08-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 6  10           1  1995-09-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 7  11           1  1995-10-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 8  12           1  1995-11-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 9  13           1  1995-12-13  credit  ...    AB  41403269.0  bank transfer       NaN
+## 
+## [10 rows x 10 columns]</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="co">## convert columns to the appropriate types</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a>transactDF[<span class="st">&#39;date&#39;</span>] <span class="op">=</span> pd.to_datetime(transactDF[<span class="st">&#39;date&#39;</span>], infer_datetime_format<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true"></a>transactDF[<span class="st">&#39;type&#39;</span>] <span class="op">=</span> transactDF[<span class="st">&#39;type&#39;</span>].astype(<span class="st">&#39;category&#39;</span>)</span></code></pre></div>
+</div>
+<div id="identify-the-account-with-most-transactions" class="section level4">
+<h4>Identify the Account with Most Transactions</h4>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="co">## count the number of transactions by accounts</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a>counts <span class="op">=</span> transactDF[<span class="st">&#39;account_id&#39;</span>].value_counts()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a><span class="co">## identify the account with the most frequent transactions</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a><span class="bu">print</span>(counts)</span></code></pre></div>
+<pre><code>## 8261    675
+## 3834    665
+## 96      661
+## 2932    655
+## 9307    649
+##        ... 
+## 1563     12
+## 1430     12
+## 727      11
+## 315      11
+## 182       9
+## Name: account_id, Length: 4500, dtype: int64</code></pre>
+</div>
+<div id="filter-the-dataframe-to-that-account" class="section level4">
+<h4>Filter the Dataframe to that Account</h4>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a><span class="co">## create sub-dataframe for the account w/ most transactions</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true"></a>subDF <span class="op">=</span> transactDF[transactDF[<span class="st">&#39;account_id&#39;</span>] <span class="op">==</span> <span class="dv">8261</span>]</span></code></pre></div>
+</div>
+<div id="generate-time-series-plot-of-account-8261-transactions" class="section level4">
+<h4>Generate Time-Series Plot of Account# 8261 Transactions</h4>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a><span class="co">## create the basic plot</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true"></a>p <span class="op">=</span> sns.lineplot(data <span class="op">=</span> subDF, x <span class="op">=</span> <span class="st">&#39;date&#39;</span>, y <span class="op">=</span> <span class="st">&#39;balance&#39;</span>, err_style <span class="op">=</span><span class="st">&#39;bars&#39;</span>)</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true"></a><span class="co">## reformat the y-axis labels</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true"></a>ylabels <span class="op">=</span> [<span class="st">&#39;$</span><span class="sc">{}</span><span class="st">&#39;</span>.<span class="bu">format</span>(<span class="bu">int</span>(x)) <span class="cf">for</span> x <span class="kw">in</span> p.get_yticks()]</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true"></a>p.set_yticklabels(ylabels)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true"></a></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true"></a><span class="co">## reformat the general plot</span></span></code></pre></div>
+<pre><code>## [Text(0, -10000.0, &#39;$-10000&#39;), Text(0, 0.0, &#39;$0&#39;), Text(0, 10000.0, &#39;$10000&#39;), Text(0, 20000.0, &#39;$20000&#39;), Text(0, 30000.0, &#39;$30000&#39;), Text(0, 40000.0, &#39;$40000&#39;), Text(0, 50000.0, &#39;$50000&#39;), Text(0, 60000.0, &#39;$60000&#39;), Text(0, 70000.0, &#39;$70000&#39;), Text(0, 80000.0, &#39;$80000&#39;)]
+## 
+## C:/Users/armyk/Anaconda3/python.exe:1: UserWarning: FixedFormatter should only be used together with FixedLocator</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a>p.set_title(<span class="st">&#39;Account #8261 Transaction History&#39;</span>, x <span class="op">=</span> <span class="fl">0.1</span>, y <span class="op">=</span> <span class="fl">1.05</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true"></a>p.set_xlabel(<span class="st">&#39;Date of Transaction&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true"></a>p.set_ylabel(<span class="st">&#39;Account Balance (USD)&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true"></a>p.spines[<span class="st">&#39;right&#39;</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true"></a>p.spines[<span class="st">&#39;top&#39;</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true"></a>plt.show()</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-13-1.png" width="960" style="display: block; margin: auto;" /> Despite having the largest number of transactions, Account #8261 has maintained a fairly consistent account balance over a five year period–from account creation until present day. The average account balance during this period has been $30,676, with a maximum of $68,181 (achieved on 14 December 1998) and a minimum of $500 on the day the account was opened.</p>
+</div>
+<div id="understand-relationship-between-account-balance-and-transaction-type" class="section level4">
+<h4>Understand Relationship Between Account Balance and Transaction Type</h4>
+<div class="sourceCode" id="cb36"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true"></a><span class="co">## set the line thickness for this plot</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true"></a>sns.set_context(rc<span class="op">=</span>{<span class="st">&quot;lines.linewidth&quot;</span>: <span class="dv">1</span>})</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true"></a><span class="co">## construct the joint plot</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true"></a>p <span class="op">=</span> sns.jointplot(data <span class="op">=</span> subDF, x <span class="op">=</span> <span class="st">&#39;amount&#39;</span>, y <span class="op">=</span> <span class="st">&#39;balance&#39;</span>, hue <span class="op">=</span> <span class="st">&#39;type&#39;</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true"></a>                  kind <span class="op">=</span> <span class="st">&#39;kde&#39;</span>, ylim <span class="op">=</span> (<span class="dv">0</span>, <span class="dv">75000</span>), levels <span class="op">=</span> <span class="dv">7</span>,</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true"></a>                  marginal_kws<span class="op">=</span><span class="bu">dict</span>(fill<span class="op">=</span><span class="va">True</span>),</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true"></a>                  palette <span class="op">=</span> {<span class="st">&#39;credit&#39;</span>:<span class="st">&#39;blue&#39;</span>, <span class="st">&#39;debit&#39;</span>:<span class="st">&#39;#C41E3A&#39;</span>}, legend <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true"></a><span class="co">## update the general plot conventions</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true"></a>p.fig.subplots_adjust(top<span class="op">=</span><span class="fl">0.94</span>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true"></a>p.fig.suptitle(<span class="st">&#39;Account #8261: Bi-Modal Credit History&#39;</span>, x <span class="op">=</span> <span class="fl">0.4</span>, y <span class="op">=</span> <span class="fl">.97</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true"></a>p.set_axis_labels(<span class="st">&#39;Transaction Amount (USD)&#39;</span>, <span class="st">&#39;Balance (USD)&#39;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span></code></pre></div>
+<pre><code>## &lt;seaborn.axisgrid.JointGrid object at 0x0000000030CF27C8&gt;</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true"></a>plt.show()</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-14-1.png" width="576" style="display: block; margin: auto;" /> Account #8261 has a clearly bi-modal deposit history, wherein credits to the account generally occur in either small or large quantities but nothing in the middle. Interestingly, deposit quanities vary widely–as in there is no single deposit amount that reoccurs frequently, for a prolonged period of time. By contrast, the majority of debits from the account are small and, usually, consistent in amount.</p>
+</div>
+<div id="understand-relationship-how-transactions-are-occur" class="section level4">
+<h4>Understand Relationship How Transactions Are Occur</h4>
+<div class="sourceCode" id="cb39"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true"></a></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true"></a><span class="co">## generate the base bar chart</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true"></a>p <span class="op">=</span> sns.catplot(data <span class="op">=</span> subDF, kind <span class="op">=</span> <span class="st">&#39;bar&#39;</span>, x <span class="op">=</span> <span class="st">&#39;type&#39;</span>, y <span class="op">=</span> <span class="st">&#39;amount&#39;</span>,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true"></a>            hue <span class="op">=</span> <span class="st">&#39;method&#39;</span>, estimator <span class="op">=</span> np.mean, </span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true"></a>            palette <span class="op">=</span> {<span class="st">&#39;cash&#39;</span>:<span class="st">&#39;#57C478&#39;</span>, <span class="st">&#39;bank transfer&#39;</span>:<span class="st">&#39;#007BA7&#39;</span>})</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true"></a><span class="co">## update the general plot conventions</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true"></a>p.fig.subplots_adjust(top<span class="op">=</span><span class="fl">0.94</span>, bottom <span class="op">=</span> <span class="fl">.12</span>)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true"></a>p.fig.suptitle(<span class="st">&#39;Account #8261: Method of Funding Transactions&#39;</span>, x <span class="op">=</span> <span class="fl">0.4</span>, y <span class="op">=</span> <span class="fl">.98</span>, </span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true"></a>fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true"></a>p.set_axis_labels(<span class="st">&#39;Transaction Amount (USD)&#39;</span>, <span class="st">&#39;Balance (USD)&#39;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span></code></pre></div>
+<pre><code>## &lt;seaborn.axisgrid.FacetGrid object at 0x00000000315CC348&gt;</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true"></a>axes <span class="op">=</span> p.axes.flatten()</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">&#39;Transaction Type&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">&#39;Transaction Amount (USD)&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true"></a>plt.show()</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-15-1.png" width="618" style="display: block; margin: auto;" /> Continuing the trend seen in the previous chart, the average debit from Account #8261 tends to be significantly smaller than average credit. Unsurprisingly, the largest credits to the account are made via bank transfer–which likely corresponds to the account holder’s salary being deposited via direct deposit. Debits, by contrast, are often made in cash.</p>
+</div>
+<div id="understand-reasons-for-account-debits" class="section level4">
+<h4>Understand Reasons For Account Debits</h4>
+<div class="sourceCode" id="cb42"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true"></a></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true"></a><span class="co">## generate the base bar chart</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true"></a>p <span class="op">=</span> sns.countplot(data <span class="op">=</span> subDF[subDF[<span class="st">&#39;type&#39;</span>] <span class="op">==</span> <span class="st">&#39;debit&#39;</span>], y <span class="op">=</span> <span class="st">&#39;category&#39;</span>, </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true"></a>palette <span class="op">=</span> {<span class="st">&#39;loan payment&#39;</span>: <span class="st">&#39;#007BA7&#39;</span>, <span class="st">&#39;household payment&#39;</span>: <span class="st">&#39;#007BA7&#39;</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true"></a>           <span class="st">&#39;insurance payment&#39;</span>: <span class="st">&#39;#007BA7&#39;</span>, <span class="st">&#39;statement charge&#39;</span>: <span class="st">&#39;#007BA7&#39;</span>})</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true"></a><span class="co">## reformat the general plot</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true"></a>p.set_title(<span class="st">&#39;Account #8261 Debits By Category&#39;</span>, x <span class="op">=</span> <span class="fl">0.1</span>, y <span class="op">=</span> <span class="fl">1.05</span>, fontsize <span class="op">=</span> <span class="dv">14</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true"></a>p.set_xlabel(<span class="st">&#39;Count&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true"></a>p.set_ylabel(<span class="st">&#39;Debit Category (If Provided)&#39;</span>, fontsize <span class="op">=</span> <span class="dv">12</span>)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true"></a>p.spines[<span class="st">&#39;right&#39;</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true"></a>p.spines[<span class="st">&#39;top&#39;</span>].set_visible(<span class="va">False</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true"></a>plt.tight_layout()</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true"></a>plt.show()</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-16-1.png" width="618" style="display: block; margin: auto;" /> The reoccuring debits for Account #8261 total are $2576 for a statement charge, insurance payment, and house payment that have existed since account creation and continue through the date of this report. To date, the account holder has paid $120,645 towards his housing payment, $40698 for insurance, and $945 in the nebulous ‘statement charge.’ For a 24 month period, the account holder succesfully paid off a 24-month loan worth more than $87,000.</p>
+</div>
+</div>
+<div id="task-5-fraud-detectionr" class="section level3">
+<h3>Task 5 (Fraud Detection–<em>R</em>)</h3>
+<div id="load-packages-and-configure-global-settings-the-r-environment-4" class="section level4">
+<h4>Load Packages and Configure Global Settings the R Environment</h4>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true"></a><span class="co">## load required packages</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true"></a><span class="kw">library</span>(ggalluvial)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true"></a><span class="kw">library</span>(ggthemes)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true"></a><span class="co">## suppress scientific notation</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true"></a><span class="kw">options</span>(<span class="dt">scipen=</span><span class="dv">999</span>)</span></code></pre></div>
+</div>
+<div id="load-inspect-the-required-data-4" class="section level4">
+<h4>Load &amp; Inspect the Required Data</h4>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true"></a><span class="co">## load the data</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true"></a>accountDF  &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/accounts_analytical.csv&#39;</span>)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true"></a>transactDF &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&#39;data/transactions.csv&#39;</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true"></a><span class="co">## preview the account dataset</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true"></a><span class="kw">head</span>(accountDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 64
+##    account_id acct_creation_d~ statement_frequ~ account_district num_customers
+##         &lt;dbl&gt; &lt;date&gt;           &lt;chr&gt;            &lt;chr&gt;                    &lt;dbl&gt;
+##  1          1 1995-03-24       monthly          Pisek                        1
+##  2          2 1993-02-26       monthly          Hl.m. Praha                  2
+##  3          3 1997-07-07       monthly          Kolin                        2
+##  4          4 1996-02-21       monthly          Pribram                      1
+##  5          5 1997-05-30       monthly          Cesky Krumlov                1
+##  6          6 1994-09-27       monthly          Trutnov                      1
+##  7          7 1996-11-24       monthly          Prostejov                    1
+##  8          8 1995-09-21       monthly          Hodonin                      2
+##  9          9 1993-01-27       monthly          Karvina                      1
+## 10         10 1996-08-28       monthly          Brno - mesto                 1
+## # ... with 59 more variables: credit_cards &lt;dbl&gt;, loan_date &lt;date&gt;,
+## #   loan_amount &lt;dbl&gt;, loan_payment &lt;dbl&gt;, loan_term &lt;dbl&gt;, loan_status &lt;chr&gt;,
+## #   loan_default &lt;lgl&gt;, max_withdrawal &lt;dbl&gt;, min_withdrawal &lt;dbl&gt;,
+## #   max_balance &lt;dbl&gt;, min_balance &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_other_avg_txn &lt;dbl&gt;, credit_cash_other_txn_ct &lt;dbl&gt;,
+## #   credit_cash_other_txn_tot &lt;dbl&gt;, credit_cash_other_avg_txn &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_ct &lt;dbl&gt;,
+## #   credit_other_interest_credit_txn_tot &lt;dbl&gt;,
+## #   credit_other_interest_credit_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_statement_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_statement_charge_avg_txn &lt;dbl&gt;, debit_cash_other_txn_ct &lt;dbl&gt;,
+## #   debit_cash_other_txn_tot &lt;dbl&gt;, debit_cash_other_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_loan_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_insurance_payment_avg_txn &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_ct &lt;dbl&gt;,
+## #   debit_bank_transfer_other_txn_tot &lt;dbl&gt;,
+## #   debit_bank_transfer_other_avg_txn &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_ct &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_txn_tot &lt;dbl&gt;,
+## #   credit_bank_transfer_pension_benefit_avg_txn &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_ct &lt;dbl&gt;,
+## #   debit_credit_card_other_txn_tot &lt;dbl&gt;,
+## #   debit_credit_card_other_avg_txn &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_household_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_household_payment_avg_txn &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_ct &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_txn_tot &lt;dbl&gt;,
+## #   debit_cash_negative_balance_charge_avg_txn &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_ct &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_txn_tot &lt;dbl&gt;,
+## #   debit_cash_insurance_payment_avg_txn &lt;dbl&gt;, pmt_order_ct &lt;dbl&gt;,
+## #   pmt_order_avg_amt &lt;dbl&gt;, owner_client_id &lt;dbl&gt;, gender &lt;chr&gt;,
+## #   birth_date &lt;date&gt;, owner_district &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true"></a><span class="co">## preview the transaction dataset</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true"></a><span class="kw">head</span>(transactDF, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 10 x 10
+##       id account_id date       type  amount balance bank  account method
+##    &lt;dbl&gt;      &lt;dbl&gt; &lt;date&gt;     &lt;chr&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; 
+##  1     1          1 1995-03-24 cred~   1000    1000 &lt;NA&gt;  NA      cash  
+##  2     5          1 1995-04-13 cred~   3679    4679 AB     4.14e7 bank ~
+##  3     6          1 1995-05-13 cred~   3679   20977 AB     4.14e7 bank ~
+##  4     7          1 1995-06-13 cred~   3679   26835 AB     4.14e7 bank ~
+##  5     8          1 1995-07-13 cred~   3679   30415 AB     4.14e7 bank ~
+##  6     9          1 1995-08-13 cred~   3679   28903 AB     4.14e7 bank ~
+##  7    10          1 1995-09-13 cred~   3679   22714 AB     4.14e7 bank ~
+##  8    11          1 1995-10-13 cred~   3679   23318 AB     4.14e7 bank ~
+##  9    12          1 1995-11-13 cred~   3679   21721 AB     4.14e7 bank ~
+## 10    13          1 1995-12-13 cred~   3679   20249 AB     4.14e7 bank ~
+## # ... with 1 more variable: category &lt;chr&gt;</code></pre>
+</div>
+<div id="reduce-merge-transaction-data-into-account-data-3" class="section level4">
+<h4>Reduce &amp; Merge Transaction Data into Account Data</h4>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true"></a><span class="co">## summarize the account balances by account id and merge that data to the </span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true"></a><span class="co">## account dataframe</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true"></a>accountDF &lt;-<span class="st"> </span>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(account_id, balance) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">meanBalance =</span> <span class="kw">mean</span>(balance)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>)</span></code></pre></div>
+</div>
+<div id="understand-credit-transaction-validity" class="section level4">
+<h4>Understand Credit Transaction Validity</h4>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true"></a><span class="co">## plot the frequency of transaction validity</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true"></a>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(method <span class="op">==</span><span class="st"> &#39;credit card&#39;</span>) <span class="op">%&gt;%</span><span class="st">   </span><span class="co">## filter transactions to only those involving a credit card</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span><span class="st">             </span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">credit_transact =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st">  </span><span class="co">## count the number of credit transactions by acct</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st">  </span><span class="co">## add that value to the accountDF</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true"></a><span class="st">  </span><span class="co">## create a new column that identifies if a credit transaction was valid or not</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">valid_credit =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(credit_cards) <span class="op">&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.na</span>(credit_transact), <span class="st">&#39;Invalid&#39;</span>, <span class="st">&#39;Valid&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">arrange</span>(account_id) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(credit_transact, credit_cards, valid_credit) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true"></a><span class="st">  </span><span class="co">## generate the plot</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">y =</span> credit_transact, <span class="dt">fill =</span> valid_credit)) <span class="op">+</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&#39;identity&#39;</span>, <span class="dt">position =</span> <span class="st">&#39;fill&#39;</span>) <span class="op">+</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#C81E4B&#39;</span>, <span class="st">&#39;#1E4BC8&#39;</span>)) <span class="op">+</span></span>
+<span id="cb49-15"><a href="#cb49-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">expand =</span> <span class="kw">c</span>(.<span class="dv">01</span>,.<span class="dv">01</span>)) <span class="op">+</span></span>
+<span id="cb49-16"><a href="#cb49-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span>percent, <span class="dt">expand =</span> <span class="kw">c</span>(.<span class="dv">01</span>, <span class="fl">.01</span>)) <span class="op">+</span></span>
+<span id="cb49-17"><a href="#cb49-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb49-18"><a href="#cb49-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>), </span>
+<span id="cb49-19"><a href="#cb49-19" aria-hidden="true"></a>        <span class="dt">axis.line.y =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.text.y =</span> <span class="kw">element_blank</span>(),</span>
+<span id="cb49-20"><a href="#cb49-20" aria-hidden="true"></a>        <span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>) <span class="op">+</span></span>
+<span id="cb49-21"><a href="#cb49-21" aria-hidden="true"></a><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></span>
+<span id="cb49-22"><a href="#cb49-22" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">y =</span> <span class="fl">.0959</span>, <span class="dt">label =</span> <span class="st">&#39;VALID&#39;</span>), <span class="dt">color =</span> <span class="st">&#39;white&#39;</span>) <span class="op">+</span></span>
+<span id="cb49-23"><a href="#cb49-23" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">y=</span>.<span class="dv">5959</span>, <span class="dt">label =</span> <span class="st">&#39;INVALID</span><span class="ch">\n</span><span class="st">TRANSACTIONS&#39;</span>), <span class="dt">color =</span> <span class="st">&#39;white&#39;</span>) <span class="op">+</span></span>
+<span id="cb49-24"><a href="#cb49-24" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Percent of Total Credit Card Transactions&#39;</span>) <span class="op">+</span></span>
+<span id="cb49-25"><a href="#cb49-25" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;Fradulent Credit Transactions?&#39;</span>,</span>
+<span id="cb49-26"><a href="#cb49-26" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&quot;More than 80% of the bank&#39;s credit transactions are invalid--that is when a credit </span></span>
+<span id="cb49-27"><a href="#cb49-27" aria-hidden="true"></a><span class="st">tranaction is associated with with an account that has no credit card listed. If this issue is</span></span>
+<span id="cb49-28"><a href="#cb49-28" aria-hidden="true"></a><span class="st">more than a clerical error, the bank inappropriately authorized more than $14.7 million in funds.&quot;</span>) </span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-20-1.png" width="960" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true"></a><span class="co">## generate a plot showing total amount spent on invalid credit transactions</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true"></a>transactDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(method <span class="op">==</span><span class="st"> &#39;credit card&#39;</span>) <span class="op">%&gt;%</span><span class="st">          </span><span class="co">##show only transactions made with credit cards</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(account_id) <span class="op">%&gt;%</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">totalCharges =</span> <span class="kw">sum</span>(amount)) <span class="op">%&gt;%</span><span class="st">    </span><span class="co">##sum the amount spent per account w/ cards</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">right_join</span>(accountDF, <span class="dt">by =</span> <span class="st">&#39;account_id&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="co">##add this value to the accountDF</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true"></a><span class="st">  </span><span class="co">## add a new column if the account has valid or invalid credit charges</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">valid_credit =</span> <span class="kw">ifelse</span>(<span class="kw">is.na</span>(credit_cards) <span class="op">&amp;</span><span class="st"> </span>totalCharges <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>,</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true"></a>                               <span class="st">&#39;Invalid&#39;</span>, <span class="st">&#39;Valid&#39;</span>)) <span class="op">%&gt;%</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true"></a><span class="st">  </span><span class="kw">arrange</span>(account_id) <span class="op">%&gt;%</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(account_id, valid_credit, totalCharges, credit_cards) <span class="op">%&gt;%</span></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(valid_credit) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true"></a><span class="st">  </span><span class="co">## calculate the total amount of valid and invalid charges</span></span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">amount =</span> <span class="kw">sum</span>(totalCharges, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(valid_credit)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true"></a><span class="st">  </span><span class="co">## generate the plot</span></span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true"></a><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> valid_credit, <span class="dt">y =</span> amount, <span class="dt">fill =</span> valid_credit)) <span class="op">+</span></span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_bar</span>(<span class="dt">stat =</span> <span class="st">&#39;identity&#39;</span>) <span class="op">+</span></span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&#39;#C81E4B&#39;</span>, <span class="st">&#39;#1E4BC8&#39;</span>)) <span class="op">+</span></span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_x_discrete</span>(<span class="dt">expand =</span> <span class="kw">c</span>(<span class="fl">0.4</span>,.<span class="dv">1</span>)) <span class="op">+</span></span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_y_continuous</span>(<span class="dt">labels =</span> scales<span class="op">::</span>dollar, <span class="dt">expand =</span> <span class="kw">c</span>(.<span class="dv">0</span>, <span class="fl">.1</span>)) <span class="op">+</span></span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_minimal</span>() <span class="op">+</span></span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">panel.grid =</span> <span class="kw">element_blank</span>(), <span class="dt">axis.line  =</span> <span class="kw">element_line</span>(<span class="dt">color =</span> <span class="st">&quot;grey10&quot;</span>), </span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true"></a>        <span class="dt">legend.position =</span> <span class="st">&#39;none&#39;</span>) <span class="op">+</span></span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true"></a><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true"></a><span class="st">  </span><span class="kw">xlab</span>(<span class="st">&#39;Valid Credit Transaction?&#39;</span>) <span class="op">+</span></span>
+<span id="cb50-27"><a href="#cb50-27" aria-hidden="true"></a><span class="st">  </span><span class="kw">ylab</span>(<span class="st">&#39;Total Amount Dispensed in Credit Transactions&#39;</span>) <span class="op">+</span></span>
+<span id="cb50-28"><a href="#cb50-28" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;The Cost of Fradulent Credit Transactions...&#39;</span>,</span>
+<span id="cb50-29"><a href="#cb50-29" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&quot;Considered from the perspective of amount issued, 81% of dollars</span></span>
+<span id="cb50-30"><a href="#cb50-30" aria-hidden="true"></a><span class="st">issued in credit transactions are assigned to accounts with out a credit card.&quot;</span>)</span></code></pre></div>
+<p><img src="visualEDA_files/figure-html/unnamed-chunk-21-1.png" width="960" style="display: block; margin: auto;" /> Based on the two charts above, this banking institution has a serious issue with its credit card program wherein more than 80% charges and 81% of dollars issued are to accounts that <strong>do not</strong> have a credit card on record. If more than a clerical error, that means the bank is responsible for more than $14.7 million invalid credit transactions. The issue does appear to be widespread with the invalid charges originating from 668 accounts, which points to an administrative error rather than nefarious action.</p>
+</div>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

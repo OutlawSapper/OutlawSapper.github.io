@@ -1,0 +1,527 @@
+---
+title: "Assignment 5: Visual EDA"
+date: "23 October 2020"
+output: 
+  html_document:
+    theme: cosmo
+    highlight: tango
+---
+
+## {.tabset .tabset-fade .tabset-pills}
+
+### Task 1 (Explore General Account Tendancies--*R*)
+
+#### Load Packages and Configure Global Settings the R Environment
+```{r Set-Environment1, message = FALSE}
+## load required packages
+library(tidyverse)
+library(ggalluvial)
+library(ggthemes)
+
+## suppress scientific notation
+options(scipen=999)
+```
+
+#### Load & Inspect the Required Data
+```{r Load-Data1, message = FALSE}
+## load the data
+accountDF  <- read_csv('data/accounts_analytical.csv')
+transactDF <- read_csv('data/transactions.csv')
+
+## preview the account dataset
+head(accountDF, 10)
+
+## preview the transaction dataset
+head(transactDF, 10)
+```
+
+#### Reduce & Merge Transaction Data into Account Data
+```{r}
+## summarize the account balances by account id and merge that data to the 
+## account dataframe
+accountDF <- transactDF %>% 
+  select(account_id, balance) %>% 
+  group_by(account_id) %>% 
+  summarise(meanBalance = mean(balance)) %>% 
+  right_join(accountDF, by = 'account_id')
+```
+
+#### Prepare Data For Alluvial Plot
+```{r Prepare-Data1, message = FALSE}
+## get account balance quantiles for prettier plotting
+balanceQuant <- cut_interval(accountDF$meanBalance, 5)
+
+## give the labels a cleaner title, order, & add to the dataframe
+labConvert <- c("[5.71e+03,2.08e+04]"  = '5th Quantile',
+                 "(2.08e+04,3.59e+04]" = '4th Quantile',
+                 "(3.59e+04,5.1e+04]"  = '3rd Quantile',
+                 "(5.1e+04,6.61e+04]"  = '2nd Quantile',
+                 "(6.61e+04,8.12e+04]" = '1st Quantile')
+
+accountDF$balanceQuant <- ordered(recode(balanceQuant, !!!labConvert), 
+                                  levels = c('1st Quantile',
+                                             '2nd Quantile',
+                                             '3rd Quantile',
+                                             '4th Quantile',
+                                             '5th Quantile'))
+
+## generate new True/False columns for Credit Cards and Loans
+## 'TRUE' if the account has had a credit card or loan associated with it
+## 'FALSE' otherwise
+accountDF$creditTF <- ifelse(!is.na(accountDF$credit_cards), TRUE, FALSE)
+accountDF$loanTF   <- ifelse(!is.na(accountDF$loan_date), TRUE, FALSE)
+```
+
+#### Construct the "Alluvial" Plot
+```{r, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## generate the alluvial plot
+accountDF %>% 
+  ## select only the three feature of interest
+  select(balanceQuant, creditTF, loanTF) %>% 
+  ## count the accounts with these features
+  group_by(balanceQuant, creditTF, loanTF) %>% 
+  summarise(freq = n()) %>% 
+  ## generate the plot
+  ggplot(aes(y = freq, axis1 = creditTF, axis2 = loanTF, axis3 = balanceQuant)) +
+  geom_alluvium(aes(fill = creditTF), width = 1/12) +
+  geom_stratum(width = 1/12, fill = 'darkslategrey', color = 'grey') +
+  geom_label(stat = 'stratum', aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Credit Card?", "Loan?", 
+                              "Average\nAccount\nBalance"),
+                   expand = c(0.04, 0.1)) +
+  scale_y_continuous(expand = c(0.02, 0.02)) +
+  scale_fill_manual(values=c("grey69", "#003366")) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), panel.border = element_blank(), 
+        legend.position = 'none', 
+        title = element_text(size = 14, color = 'grey10'),
+        plot.subtitle = element_text(size = 10, color = 'grey10', hjust = 0,
+                                     margin = margin(-5,0,10,0)),
+        axis.text = element_text(size = 12, color = 'grey10')) +
+  labs(title = 'Mutually Exlusive...Credit Cards & Loans?', 
+       subtitle = 'While "credit card" and "loan" history appear to have little
+relationship with the associated account balance, less than 1% of accounts have 
+both a "credit card" and a "loan" associated with it.') +
+  ylab('Number of Accounts') +
+  xlab('Account Condition')
+```
+The figure above highlights several peculiar aspects of this dataset's credit card, loan history, and account balance statistics. First, as is clearly visible in the figure, only 14% and 15% of accounts have a credit card or loan associated it, respectively. Of particular interest, only 39 accounts at this banking institution have both a credit card or loan associated with it, which is less than 1% of all accounts. A similar trend is that the average balance of accounts that possess a credit card is approximately similar to the average balance of accounts that have a loan history, except for the highest (1st Quantile) and lowest (5th Quantile) balance accounts. Interestingly, high-balance accounts at this institution are slightly more likely to have loan history than a credit card perhaps indicating that the bank's credit cards do not offer industry-competitive perks that can only be obtained by high-earners (such as American Express). Conversely, low-balance accounts are less likely to have taken out a loan than they are to have a bank sponsored credit card.
+
+### Task 2 (Understanding Loans--*R*)
+
+#### Load Packages and Configure Global Settings the R Environment
+```{r Set-Environment2, message = FALSE}
+## load required packages
+library(tidyverse)
+library(ggalluvial)
+library(ggthemes)
+
+## suppress scientific notation
+options(scipen=999)
+```
+
+#### Load & Inspect the Required Data
+```{r Load-Data2, message = FALSE}
+## load the data
+accountDF  <- read_csv('data/accounts_analytical.csv')
+transactDF <- read_csv('data/transactions.csv')
+
+## preview the account dataset
+head(accountDF, 10)
+
+## preview the transaction dataset
+head(transactDF, 10)
+```
+
+#### Reduce & Merge Transaction Data into Account Data
+```{r, message = FALSE, warning = FALSE}
+## summarize the account balances by account id and merge that data to the 
+## account dataframe
+accountDF <- transactDF %>% 
+  select(account_id, balance) %>% 
+  group_by(account_id) %>% 
+  summarise(meanBalance = mean(balance)) %>% 
+  right_join(accountDF, by = 'account_id')
+```
+
+#### Loan Status Review (Active v. Expired)
+```{r build-plot21, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## generate the plot
+accountDF %>% 
+  ## retain only accounts that have a loan history
+  filter(!is.na(loan_date)) %>% 
+  select(loan_date, loan_amount, loan_payment, loan_term, loan_payment, loan_status, loan_default) %>% 
+  ## convert loan_term to a factor (which is more appropriate for this plot)
+  mutate_at(vars(loan_term), factor) %>% 
+  ## generate the plot
+  ggplot(aes(x = loan_amount, fill = loan_status)) +
+  geom_histogram(bins = 30, color = 'grey30') +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10")) +
+  scale_fill_manual(values = c('#1E4BC8','grey69'), name = 'Loan Status?') +
+  scale_x_continuous(labels = scales::dollar_format(), expand = c(.02, .02)) +
+  scale_y_continuous(expand = c(.005, .005)) +
+  ylab('Frequency') +
+  xlab('Loan Amount (USD)') +
+  labs(title = 'A Comparison of Loan Amount History',
+       subtitle = 'The bank appears to issue loans (based on loan amount only) at approximately the
+rate as they historically have.')
+```
+The bank has more than \$80 million issued in current loans (spread across 448 accounts) and has recovered more than \$18.5 million from expired loans. Based on this analysis, the bank has lost more than \$4 million on defaulted loans and is on pace to loose more than \$11 million if all loans in current default expire without satisfactory resolution. That being said, it appears that the bank has not altered its loan issuing strategy from the perspective of loan quantities--that is the distribution of loan amounts is approximately similar for both current and expired loans. 
+
+These two charts, taken together, indicate that this banking institution has assumed greater risk recently--especially for longer-term, higher-quantity loans than is likely advisable.
+
+#### Understanding Loan Defaults
+```{r build-plot22, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## generate the plot
+accountDF %>% 
+  ## retain only accounts with a loan history
+  filter(!is.na(loan_date)) %>% 
+  select(loan_date, loan_amount, loan_payment, loan_term, loan_payment, loan_status, loan_default) %>% 
+  ## convert the loan term to a factor
+  mutate_at(vars(loan_term), factor) %>% 
+  ##create the plot
+  ggplot(aes(x = loan_term, y = loan_amount, fill = loan_default)) +
+  geom_boxplot() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10")) +
+  scale_fill_manual(values = c('#1E4BC8','#C81E4B'), name = 'In Default?') +
+  ylab('Loan Amount (USD)') +
+  xlab('Loan Term (Months)') +
+  labs(title = 'Inappropriate Assumption of Risk in Long-Term Loans',
+       subtitle = 'While the rate of loan default (as measured by term length) remains consistent around
+12% for loans in excess of 24 months, the average funds lost per default exceeds the 
+average loan amount for that same loan length.')
+```
+Based on the above plot, this bank should relook its metrics for loan issuance for loans exceeding 12 months since the average funds lost per default greatly out-paces the average loan amount for loans with similar term-lengths. This indicidates that loan underwriters are assuming too much risk for long-term, large-quantity loans than is finacially prudent.
+
+### Task 3 (Understanding Good v. Bad Loans--*R*)
+
+#### Load Packages and Configure Global Settings the R Environment
+```{r Set-Environment3, message = FALSE}
+## load required packages
+library(tidyverse)
+library(ggalluvial)
+library(ggthemes)
+
+## suppress scientific notation
+options(scipen=999)
+```
+
+#### Load & Inspect the Required Data
+```{r Load-Data3, message = FALSE}
+## load the data
+accountDF  <- read_csv('data/accounts_analytical.csv')
+transactDF <- read_csv('data/transactions.csv')
+
+## preview the account dataset
+head(accountDF, 10)
+
+## preview the transaction dataset
+head(transactDF, 10)
+```
+
+#### Reduce & Merge Transaction Data into Account Data
+```{r, message = FALSE, warning = FALSE}
+## summarize the account balances by account id and merge that data to the 
+## account dataframe
+accountDF <- transactDF %>% 
+  select(account_id, balance) %>% 
+  group_by(account_id) %>% 
+  summarise(meanBalance = mean(balance)) %>% 
+  right_join(accountDF, by = 'account_id')
+```
+
+#### Loan Default by Time From Account Opening
+```{r, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## build the plot
+accountDF %>% 
+  select(acct_creation_date, loan_date, loan_default, loan_term) %>% 
+  ## retain only accounts with loan history
+  filter(!is.na(loan_date)) %>% 
+  ## calculate the amount of time from account open to loan request
+  mutate(loan_delay = loan_date-acct_creation_date) %>% 
+  ## convert loan term to factor
+  mutate_at(vars(loan_term), factor) %>%
+  ## create the plot
+  ggplot(aes(x = loan_default, y = loan_delay, fill = loan_default)) +
+  geom_boxplot(notch = TRUE, notchwidth = .85) +
+  scale_fill_manual(values = c('#1E4BC8','#C81E4B')) +
+  geom_jitter(width = .27, fill = 'grey20', color = 'grey20') +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10"), 
+        legend.position = 'none') +
+  ylab('Time From Account Creation to Loan Request (Days)') +
+  xlab('Loan in Default?') +
+  labs(title = 'Account Created for Loan Only?',
+       subtitle = 'While some evidence suggests that loans requested shortly after account creation
+are at a higher risk of defaulting, the difference is insignificant.')
+```
+While the average number of days between account creation and loan request is 40 days shorter for accounts that eventually default on a loan that difference is statistically insignificant. The more likely determinant of default is the loan amount. As seen in the plot below, the average amount of a loan that defaults is \$205,002 compared to \$144,689--a difference of $60,313 that is statistically significant.
+
+#### Loan Default by Loan Amount
+```{r, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## generate the plot
+accountDF %>% 
+  select(acct_creation_date, loan_date, loan_default, loan_term, loan_amount) %>% 
+  ## retain only accounts with loan data
+  filter(!is.na(loan_date)) %>% 
+  ## generate the plot
+  ggplot(aes(x = loan_default, y = loan_amount, fill = loan_default)) +
+  geom_boxplot(notch = TRUE, notchwidth = .85) +
+  scale_fill_manual(values = c('#1E4BC8','#C81E4B')) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10"), 
+        legend.position = 'none') +
+  ylab('Loan Amount (USD)') +
+  xlab('Loan in Default?') +
+  labs(title = 'More Money, More Default Risk',
+       subtitle = 'There is more than a $60,000 difference between average loan amounts for accounts
+that satisfactorily repay a loan compared to those that eventually default.')
+```
+
+### Task 4 (Account #8261 Visual EDA--*Python*)
+
+```{r, include = FALSE}
+## load and initialize the python environment
+library(reticulate)
+library(knitr)
+
+#specifying which version of python to use
+use_python('C:/Users/armyk/Anaconda3/python.exe')
+knitr::knit_engines$set(python = reticulate::eng_python)
+```
+
+
+#### Load Packages and Configure Global Settings the R Environment
+
+```{python}
+## load python packages
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+#import os as os
+
+# os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = C:/Users/armyk/Anaconda3/Library/plugins/platforms
+```
+
+#### Load & Inspect the Required Data
+```{python}
+## load the dataframe and inspect its structure
+transactDF = pd.read_csv(r'data/transactions.csv', low_memory = False)
+print(transactDF.head(10))
+```
+
+```{python}
+## convert columns to the appropriate types
+transactDF['date'] = pd.to_datetime(transactDF['date'], infer_datetime_format=True)
+transactDF['type'] = transactDF['type'].astype('category')
+```
+
+#### Identify the Account with Most Transactions
+```{python}
+## count the number of transactions by accounts
+counts = transactDF['account_id'].value_counts()
+
+## identify the account with the most frequent transactions
+print(counts)
+```
+
+#### Filter the Dataframe to that Account
+```{python}
+## create sub-dataframe for the account w/ most transactions
+subDF = transactDF[transactDF['account_id'] == 8261]
+```
+
+#### Generate Time-Series Plot of Account# 8261 Transactions
+```{python, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## create the basic plot
+p = sns.lineplot(data = subDF, x = 'date', y = 'balance', err_style ='bars')
+
+## reformat the y-axis labels
+ylabels = ['${}'.format(int(x)) for x in p.get_yticks()]
+p.set_yticklabels(ylabels)
+
+## reformat the general plot
+p.set_title('Account #8261 Transaction History', x = 0.1, y = 1.05, fontsize = 14)
+p.set_xlabel('Date of Transaction', fontsize = 12)
+p.set_ylabel('Account Balance (USD)', fontsize = 12)
+p.spines['right'].set_visible(False)
+p.spines['top'].set_visible(False)
+
+plt.show()
+```
+Despite having the largest number of transactions, Account #8261 has maintained a fairly consistent account balance over a five year period--from account creation until present day. The average account balance during this period has been \$30,676, with a maximum of \$68,181 (achieved on 14 December 1998) and a minimum of $500 on the day the account was opened.
+
+
+#### Understand Relationship Between Account Balance and Transaction Type
+```{python, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## set the line thickness for this plot
+sns.set_context(rc={"lines.linewidth": 1})
+
+## construct the joint plot
+p = sns.jointplot(data = subDF, x = 'amount', y = 'balance', hue = 'type',
+                  kind = 'kde', ylim = (0, 75000), levels = 7,
+                  marginal_kws=dict(fill=True),
+                  palette = {'credit':'blue', 'debit':'#C41E3A'}, legend = False)
+
+## update the general plot conventions
+p.fig.subplots_adjust(top=0.94)
+p.fig.suptitle('Account #8261: Bi-Modal Credit History', x = 0.4, y = .97, fontsize = 14)
+p.set_axis_labels('Transaction Amount (USD)', 'Balance (USD)', fontsize=12)
+
+plt.show()
+```
+Account #8261 has a clearly bi-modal deposit history, wherein credits to the account generally occur in either small or large quantities but nothing in the middle. Interestingly, deposit quanities vary widely--as in there is no single deposit amount that reoccurs frequently, for a prolonged period of time. By contrast, the majority of debits from the account are small and, usually, consistent in amount. 
+
+#### Understand Relationship How Transactions Are Occur
+```{python, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+
+## generate the base bar chart
+p = sns.catplot(data = subDF, kind = 'bar', x = 'type', y = 'amount',
+            hue = 'method', estimator = np.mean, 
+            palette = {'cash':'#57C478', 'bank transfer':'#007BA7'})
+
+## update the general plot conventions
+p.fig.subplots_adjust(top=0.94, bottom = .12)
+p.fig.suptitle('Account #8261: Method of Funding Transactions', x = 0.4, y = .98, 
+fontsize = 14)
+p.set_axis_labels('Transaction Amount (USD)', 'Balance (USD)', fontsize=12)
+axes = p.axes.flatten()
+axes[0].set_xlabel('Transaction Type', fontsize = 12)
+axes[0].set_ylabel('Transaction Amount (USD)', fontsize = 12)
+
+plt.show()
+```
+Continuing the trend seen in the previous chart, the average debit from Account #8261 tends to be significantly smaller than average credit. Unsurprisingly, the largest credits to the account are made via bank transfer--which likely corresponds to the account holder's salary being deposited via direct deposit. Debits, by contrast, are often made in cash.
+
+#### Understand Reasons For Account Debits
+```{python, message = FALSE, warning = FALSE, fig.align='center', fig.width = 15, fig.height = 15}
+
+## generate the base bar chart
+p = sns.countplot(data = subDF[subDF['type'] == 'debit'], y = 'category', 
+palette = {'loan payment': '#007BA7', 'household payment': '#007BA7',
+           'insurance payment': '#007BA7', 'statement charge': '#007BA7'})
+
+## reformat the general plot
+p.set_title('Account #8261 Debits By Category', x = 0.1, y = 1.05, fontsize = 14)
+p.set_xlabel('Count', fontsize = 12)
+p.set_ylabel('Debit Category (If Provided)', fontsize = 12)
+p.spines['right'].set_visible(False)
+p.spines['top'].set_visible(False)
+
+plt.tight_layout()
+plt.show()
+```
+The reoccuring debits for Account #8261 total are \$2576 for a statement charge, insurance payment, and house payment that have existed since account creation and continue through the date of this report. To date, the account holder has paid \$120,645 towards his housing payment, \$40698 for insurance, and \$945 in the nebulous 'statement charge.' For a 24 month period, the account holder succesfully paid off a 24-month loan worth more than \$87,000. 
+
+### Task 5 (Fraud Detection--*R*)
+
+#### Load Packages and Configure Global Settings the R Environment
+```{r, message = FALSE}
+## load required packages
+library(tidyverse)
+library(ggalluvial)
+library(ggthemes)
+
+## suppress scientific notation
+options(scipen=999)
+```
+
+#### Load & Inspect the Required Data
+```{r, message = FALSE}
+## load the data
+accountDF  <- read_csv('data/accounts_analytical.csv')
+transactDF <- read_csv('data/transactions.csv')
+
+## preview the account dataset
+head(accountDF, 10)
+
+## preview the transaction dataset
+head(transactDF, 10)
+```
+
+#### Reduce & Merge Transaction Data into Account Data
+```{r, message = FALSE, warning = FALSE}
+## summarize the account balances by account id and merge that data to the 
+## account dataframe
+accountDF <- transactDF %>% 
+  select(account_id, balance) %>% 
+  group_by(account_id) %>% 
+  summarise(meanBalance = mean(balance)) %>% 
+  right_join(accountDF, by = 'account_id')
+```
+
+
+#### Understand Credit Transaction Validity
+```{r, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## plot the frequency of transaction validity
+transactDF %>% 
+  filter(method == 'credit card') %>%   ## filter transactions to only those involving a credit card
+  group_by(account_id) %>%             
+  summarise(credit_transact = n()) %>%  ## count the number of credit transactions by acct
+  right_join(accountDF, by = 'account_id') %>%  ## add that value to the accountDF
+  ## create a new column that identifies if a credit transaction was valid or not
+  mutate(valid_credit = ifelse(is.na(credit_cards) & !is.na(credit_transact), 'Invalid', 'Valid')) %>% 
+  arrange(account_id) %>% 
+  select(credit_transact, credit_cards, valid_credit) %>% 
+  ## generate the plot
+  ggplot(aes(x = 1, y = credit_transact, fill = valid_credit)) +
+  geom_bar(stat = 'identity', position = 'fill') +
+  scale_fill_manual(values = c('#C81E4B', '#1E4BC8')) +
+  scale_x_continuous(expand = c(.01,.01)) +
+  scale_y_continuous(labels = scales::percent, expand = c(.01, .01)) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10"), 
+        axis.line.y = element_blank(), axis.title.y = element_blank(), axis.text.y = element_blank(),
+        legend.position = 'none') +
+  coord_flip() +
+  geom_text(aes(y = .0959, label = 'VALID'), color = 'white') +
+  geom_text(aes(y=.5959, label = 'INVALID\nTRANSACTIONS'), color = 'white') +
+  ylab('Percent of Total Credit Card Transactions') +
+  labs(title = 'Fradulent Credit Transactions?',
+       subtitle = "More than 80% of the bank's credit transactions are invalid--that is when a credit 
+tranaction is associated with with an account that has no credit card listed. If this issue is
+more than a clerical error, the bank inappropriately authorized more than $14.7 million in funds.") 
+```
+
+```{r, message = FALSE, warning = FALSE, fig.align='center', fig.width = 10, fig.height = 6}
+## generate a plot showing total amount spent on invalid credit transactions
+transactDF %>% 
+  filter(method == 'credit card') %>%          ##show only transactions made with credit cards
+  group_by(account_id) %>%
+  summarise(totalCharges = sum(amount)) %>%    ##sum the amount spent per account w/ cards
+  right_join(accountDF, by = 'account_id') %>% ##add this value to the accountDF
+  ## add a new column if the account has valid or invalid credit charges
+  mutate(valid_credit = ifelse(is.na(credit_cards) & totalCharges > 0,
+                               'Invalid', 'Valid')) %>%
+  arrange(account_id) %>%
+  select(account_id, valid_credit, totalCharges, credit_cards) %>%
+  group_by(valid_credit) %>% 
+  ## calculate the total amount of valid and invalid charges
+  summarise(amount = sum(totalCharges, na.rm = TRUE)) %>% 
+  filter(!is.na(valid_credit)) %>% 
+  ## generate the plot
+  ggplot(aes(x = valid_credit, y = amount, fill = valid_credit)) +
+  geom_bar(stat = 'identity') +
+  scale_fill_manual(values = c('#C81E4B', '#1E4BC8')) +
+  scale_x_discrete(expand = c(0.4,.1)) +
+  scale_y_continuous(labels = scales::dollar, expand = c(.0, .1)) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.line  = element_line(color = "grey10"), 
+        legend.position = 'none') +
+  coord_flip() +
+  xlab('Valid Credit Transaction?') +
+  ylab('Total Amount Dispensed in Credit Transactions') +
+  labs(title = 'The Cost of Fradulent Credit Transactions...',
+       subtitle = "Considered from the perspective of amount issued, 81% of dollars
+issued in credit transactions are assigned to accounts with out a credit card.")
+```
+Based on the two charts above, this banking institution has a serious issue with its credit card program wherein more than 80% charges and 81% of dollars issued are to accounts that **do not** have a credit card on record. If more than a clerical error, that means the bank is responsible for more than $14.7 million invalid credit transactions. The issue does appear to be widespread with the invalid charges originating from 668 accounts, which points to an administrative error rather than nefarious action. 
+
+
+
+

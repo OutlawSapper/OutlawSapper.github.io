@@ -1,0 +1,23 @@
+---
+title: "Assignment 2"
+date: "11 September 2020"
+---
+
+<em> This assignment required students to provide techical and visual critiques for three publically available graphic. Note, the graph numbers correspond to the randomly assigned charts, which were randomly assigned.  </em>
+<br><br>
+
+### NOAA: Hurricane Chart
+
+![](images/20200904_ANLY503_A2-2.jpg)
+<br><br>
+
+### Unknown: Property Flooding
+![](images/20200904_ANLY503_A2-3.png)
+<br><br>
+
+### Economist: COVID Response
+![](images/20200904_ANLY503_A2-4.png)
+<br><br>
+
+### Unknown: Retirement Ages
+![](images/20200904_ANLY503_A2-5.png)

@@ -1,9 +1,37 @@
 name: "my-website"
 output_dir: 'docs'
 navbar:
-  title: "My Website"
+  title: "Thomas Malejko"
   left:
     - text: "Home"
       href: index.html
     - text: "About"
       href: about.html
+    - text: "ANLY-503 Work"
+      menu:
+        - text: "About ANLY-503"
+          href: about503.html
+        - text: "Assignment 1"
+          href: assignment1.html
+        - text: "Assignment 2"
+          href: assignment2.html
+        - text: "Assignment 3"
+          href: assignment3.html
+        - text: "Assignment 4 (Not Included)"
+        - text: "Assignment 5"
+          href: visualEDA.html
+        - text: "Assignment 6 (External Link)"
+          href: geospatial.html
+        - text: "Assignment 7"
+          href: networks.html
+        - text: "Project"
+          href: project.html
+    - text: "Top Charts!"
+      href: bestCharts.html
+    - text: "Other Work"
+      href: otherWork.html
+
+output:
+  html_document:
+    theme: cosmo
+    highlight: tango

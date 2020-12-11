@@ -1,5 +1,40 @@
 ---
-title: "About This Website"
+title: "About"
 ---
 
-More about this website.
+Army Officer and data analyst striving to provide organizational leaders with useful and actionable insights into the conditions, processes, and behaviors of their environment through the employment of modern tools and techniques, including: statistical analysis and modelling, regression analysis, hypothesis testing, supervised/unsupervised machine learning, and data visualization.
+
+Ten years of military experience with two deployments to Afghanistan and other overseas assignments in Germany and Hawaii. This professional experience includes leadership of diverse teams in high-stress environments, thorough planning and coordination, process development, and complex problem-solving.
+
+### **Professional Awards & Recognition**
+
+* Summer 2017 Best Practice Article Award: Center for Army Lessons Learned (Best Practice: Fighting the Analog War…Again)
+* National Training Center Trainer of Rotation 14-09
+* Engineer Captains Career Course 14-01 Combined Arms Tactics Awardee
+* 2012 Best Junior Officer Award from 21st Theater Sustainment Command, a 13,000-soldier organization
+* Graduated on the USMA Superintendent’s List (Top 5%)
+* USMA Sprint Football Letterman (1st Team All-Conference & Dyer Award for excellence as a Student-Athlete) 
+
+### **Skills & Experiences**
+
+**Proficient Computer Languages/Tools**: Python | R | PySpark | Tableau | Excel | PowerPoint
+
+**Familiar Computer Languages/Tools**: HTML | SQL | Hadoop | AWS Cloud Computing (EMR, EC2, S3)
+
+### **Additional Skills**:
+
+* Organizational Leadership
+* Joint, Interagency, Intergovernmental, Multinational Experience
+* Extensive OCONUS Experience (Europe and Hawaii)
+* Instructional Experience: Observer/Controller and Teaching Assistant
+* Public Speaking & Presentation
+* Civil Engineer in Training (New York, 2010)
+* Photography & Adobe Lightroom
+
+### **Connect With Me**
+![Email Me](images/emailIcon.png){width=25px}   thomas.p.malejko@gmail.com
+<br>
+![LinkedIn](images/linkedinIcon.png){width=25px} [www.linkedin.com/in/tpm72](https://www.linkedin.com/in/tpm72/)
+<br>
+![Locate Me](images/locationIcon.png){width=25px} Springfield, VA
+

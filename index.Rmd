@@ -1,9 +1,7 @@
 ---
-title: "My Website"
-output:
-  html_document:
-    theme: cosmo
-    highlight: tango
+title: "Thomas Malejko"
 ---
 
-Test Text...
+Army Officer and data analyst striving to provide organizational leaders with useful and actionable insights into the conditions, processes, and behaviors of their environment through the employment of modern tools and techniques, including: statistical analysis and modelling, regression analysis, hypothesis testing, and supervised/unsupervised machine learning.
+
+More than ten years of military experience with two deployments to Afghanistan and other overseas assignments in Germany and Hawaii. This professional experience includes leadership of diverse teams in high-stress environments, thorough planning and coordination, process development, and complex problem-solving. 

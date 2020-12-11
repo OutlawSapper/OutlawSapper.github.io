@@ -1,0 +1,12 @@
+---
+title: "Assignment 3"
+date: "18 September 2020"
+---
+
+<em> Make It Ugly, Then Make It Better! This assignment required students to find a data story in the Gapminder dataset. then generate five charts with the following aestetics: ugly, clean, Nicolas Felton, news publication, and art gallery. </em>
+<br>
+
+### The Final Products...
+![](images/20200917_ANLY503_A3-1.png)
+
+![](images/20200917_ANLY503_A3-2.png)

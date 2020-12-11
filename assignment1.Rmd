@@ -1,0 +1,12 @@
+---
+title: "Assignment 1"
+date: "4 September 2020"
+---
+
+<em> This assignment required students to identify a story in the famed Gapminder Dataset and hand-draw three conceptual data visualizations to suppor that theme. </em>
+
+### The Final Product...
+
+![40 Years of War & Unrest in Afghanistan](images/20200831_ANLY503_A1.png)
+
+

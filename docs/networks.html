@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2020-11-08" />
+
+<title>Assignment 7: Network Graphs</title>
+
+<script src="site_libs/header-attrs-2.1/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  background-color: #f8f8f8; }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Thomas Malejko</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    ANLY-503 Work
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="about503.html">About ANLY-503</a>
+    </li>
+    <li>
+      <a href="assignment1.html">Assignment 1</a>
+    </li>
+    <li>
+      <a href="assignment2.html">Assignment 2</a>
+    </li>
+    <li>
+      <a href="assignment3.html">Assignment 3</a>
+    </li>
+    <li class="dropdown-header">Assignment 4 (Not Included)</li>
+    <li>
+      <a href="visualEDA.html">Assignment 5</a>
+    </li>
+    <li>
+      <a href="geospatial.html">Assignment 6 (External Link)</a>
+    </li>
+    <li>
+      <a href="networks.html">Assignment 7</a>
+    </li>
+    <li>
+      <a href="project.html">Project</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="bestCharts.html">Top Charts!</a>
+</li>
+<li>
+  <a href="otherWork.html">Other Work</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Assignment 7: Network Graphs</h1>
+<h4 class="date">08 November 2020</h4>
+
+</div>
+
+
+<div id="load-the-required-packages" class="section level4">
+<h4>Load the Required Packages</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="co">## load required libraries and set global conditions</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="kw">library</span>(janitor)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="kw">library</span>(tidygraph)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a><span class="kw">library</span>(ggraph)</span></code></pre></div>
+</div>
+<div id="load-the-data" class="section level4">
+<h4>Load the Data</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>DF &lt;-<span class="st"> </span>readxl<span class="op">::</span><span class="kw">read_excel</span>(<span class="st">&quot;data/State_to_State_Migrations_Table_2018.xls&quot;</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>                         <span class="dt">skip =</span> <span class="dv">5</span>)</span></code></pre></div>
+</div>
+<div id="clean-reformat-the-data" class="section level4">
+<h4>Clean &amp; Reformat the Data</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="co">## set the name of the first cell to be &#39;Target&#39;, needed for the row realignment</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>DF[<span class="dv">1</span>, <span class="dv">1</span>] =<span class="st"> &#39;Target&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## clean the dataset</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>cleanDF &lt;-<span class="st"> </span>DF <span class="op">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="st">  </span><span class="co">## move the first row to column name</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="st">  </span><span class="kw">row_to_names</span>(<span class="dt">row_number =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="st">  </span><span class="co">## create distinct names</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="st">  </span><span class="kw">clean_names</span>() <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="st">  </span><span class="co">## remove columns that start with &#39;na&#39; or are not a US State</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">starts_with</span>(<span class="st">&#39;na&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(total, total_<span class="dv">2</span>, puerto_rico, u_s_island_area, foreign_country)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="st">  </span><span class="co">## drop records w/ NA values (note: this does not include &#39;N/A&#39; values which are valid)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="st">  </span><span class="kw">drop_na</span>(target, alabama) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="st">  </span><span class="co">## remove the US and Puerto Rico from the target column</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(target <span class="op">!=</span><span class="st"> &#39;United States2&#39;</span> <span class="op">&amp;</span><span class="st"> </span>target <span class="op">!=</span><span class="st"> &#39;Puerto Rico&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="st">  </span><span class="co">## transpose the tibble, rename the columns, and convert back to a tibble</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">t</span>() <span class="op">%&gt;%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">row_to_names</span>(<span class="dt">row_number =</span> <span class="dv">1</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">as_tibble</span>(<span class="dt">rownames =</span> <span class="ot">NA</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="st">  </span><span class="kw">clean_names</span>()</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co">## extract the row names</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>rows &lt;-<span class="st"> </span><span class="kw">rownames</span>(cleanDF)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a><span class="co">## convert all columns to numeric</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>cleanDF &lt;-<span class="st"> </span>cleanDF <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate_all</span>(as.numeric)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a><span class="co">## add a new column for the &#39;source&#39; state--previously rownames</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>cleanDF<span class="op">$</span>source &lt;-<span class="st"> </span>rows</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a><span class="co">## transform data to &#39;long&#39; form</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>cleanDF &lt;-<span class="st"> </span>cleanDF <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a><span class="st">  </span><span class="co">## move source column to first position</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a><span class="st">  </span><span class="kw">select</span>(source, <span class="kw">everything</span>()) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a><span class="st">  </span><span class="co">## select only the four states of interest</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a><span class="st">  </span><span class="kw">filter</span>(source <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;new_york&#39;</span>, <span class="st">&#39;texas&#39;</span>, <span class="st">&#39;maine&#39;</span>, <span class="st">&#39;pennsylvania&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a><span class="st">  </span><span class="co">## pivot the data longer on the source column</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a><span class="st">  </span><span class="kw">pivot_longer</span>(<span class="op">!</span>source, <span class="dt">names_to =</span> <span class="st">&#39;target&#39;</span>, <span class="dt">values_to =</span> <span class="st">&#39;count&#39;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a><span class="st">  </span><span class="co">## select the top 10 migration destinations by source column</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a><span class="st">  </span><span class="kw">group_by</span>(source) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a><span class="st">  </span><span class="kw">slice_max</span>(<span class="dt">n =</span> <span class="dv">10</span>, <span class="dt">order_by =</span> count) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a><span class="st">  </span><span class="co">## clean the titles</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">source =</span> stringr<span class="op">::</span><span class="kw">str_to_title</span>(<span class="kw">gsub</span>(<span class="st">&#39;_&#39;</span>, <span class="st">&#39; &#39;</span>, source))) <span class="op">%&gt;%</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true"></a><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">target =</span> stringr<span class="op">::</span><span class="kw">str_to_title</span>(<span class="kw">gsub</span>(<span class="st">&#39;_&#39;</span>, <span class="st">&#39; &#39;</span>, target)))</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true"></a><span class="co">## see the final, cleaned dataframe</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true"></a><span class="kw">head</span>(cleanDF, <span class="dv">15</span>)</span></code></pre></div>
+<pre><code>## # A tibble: 15 x 3
+## # Groups:   source [2]
+##    source   target         count
+##    &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+##  1 Maine    New Hampshire   4016
+##  2 Maine    Massachusetts   3188
+##  3 Maine    Florida         2783
+##  4 Maine    Connecticut     1342
+##  5 Maine    California      1294
+##  6 Maine    North Carolina  1235
+##  7 Maine    Maryland         990
+##  8 Maine    Pennsylvania     916
+##  9 Maine    Colorado         912
+## 10 Maine    Texas            815
+## 11 New York New Jersey     64810
+## 12 New York Florida        63033
+## 13 New York Pennsylvania   43048
+## 14 New York California     34848
+## 15 New York Connecticut    27361</code></pre>
+</div>
+<div id="reformat-to-a-graph-object" class="section level4">
+<h4>Reformat to a Graph Object</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">## create a duplicate of the source column for proper coloring later</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>cleanDF<span class="op">$</span>lineColor &lt;-<span class="st"> </span>cleanDF<span class="op">$</span>source</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">## create the graph</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>graph &lt;-<span class="st"> </span><span class="kw">as_tbl_graph</span>(cleanDF)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a>graph</span></code></pre></div>
+<pre><code>## # A tbl_graph: 23 nodes and 40 edges
+## #
+## # A directed simple graph with 1 component
+## #
+## # Node Data: 23 x 1 (active)
+##   name         
+##   &lt;chr&gt;        
+## 1 Maine        
+## 2 New York     
+## 3 Pennsylvania 
+## 4 Texas        
+## 5 New Hampshire
+## 6 Massachusetts
+## # ... with 17 more rows
+## #
+## # Edge Data: 40 x 4
+##    from    to count lineColor
+##   &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;    
+## 1     1     5  4016 Maine    
+## 2     1     6  3188 Maine    
+## 3     1     7  2783 Maine    
+## # ... with 37 more rows</code></pre>
+</div>
+<div id="generate-the-plot" class="section level4">
+<h4>Generate the Plot</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="co">## create the base plot</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">ggraph</span>(graph, <span class="dt">layout =</span> <span class="st">&#39;linear&#39;</span>, <span class="dt">circular =</span> <span class="ot">TRUE</span>) <span class="op">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="st">  </span><span class="co">## add arced edges with line color being the source state, width being the total </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="st">  </span><span class="co">## movers along that edge, and arrows for direction</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="st">  </span><span class="co">## Note: label_rect keeps arrows/text from overlapping</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_edge_arc</span>(<span class="kw">aes</span>(<span class="dt">color =</span> lineColor, <span class="dt">width =</span> count,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a>                    <span class="dt">start_cap =</span> <span class="kw">label_rect</span>(node1.name),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>                    <span class="dt">end_cap =</span> <span class="kw">label_rect</span>(node2.name)),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>                 <span class="dt">arrow =</span> <span class="kw">arrow</span>(<span class="dt">angle =</span> <span class="dv">25</span>, <span class="dt">length =</span> <span class="kw">unit</span>(<span class="fl">2.5</span>, <span class="st">&#39;mm&#39;</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a>                               <span class="dt">type =</span> <span class="st">&#39;closed&#39;</span>), <span class="dt">show.legend =</span> <span class="ot">TRUE</span>) <span class="op">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="st">  </span><span class="co">## rescale the edge width so differences can be observed</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_edge_width</span>(<span class="dt">range =</span> <span class="kw">c</span>(.<span class="dv">2</span>, <span class="fl">1.25</span>), <span class="dt">name =</span> <span class="st">&#39;Total Movers&#39;</span>, </span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>                   <span class="dt">guide =</span> <span class="kw">guide_legend</span>(<span class="dt">direction =</span> <span class="st">&#39;horizontal&#39;</span>, </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>                                        <span class="dt">title.position =</span> <span class="st">&#39;top&#39;</span>)) <span class="op">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="st">  </span><span class="co">## recolor the edges based on state flag colors (loosely)</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a><span class="st">  </span><span class="kw">scale_edge_color_manual</span>(<span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;#FFD500&quot;</span>, <span class="st">&quot;#002D72&quot;</span>, <span class="st">&quot;#82CCE2&quot;</span>, <span class="st">&quot;#BF0A30&quot;</span>), <span class="dt">guide =</span> <span class="ot">FALSE</span>) <span class="op">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a><span class="st">  </span><span class="co">## add the text as the nodes</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a><span class="st">  </span><span class="kw">geom_node_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> name)) <span class="op">+</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme_void</span>() <span class="op">+</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&#39;bottom&#39;</span>, <span class="dt">legend.justification =</span> <span class="st">&#39;right&#39;</span>, </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a>        <span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">size =</span> <span class="dv">16</span>)) <span class="op">+</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a><span class="st">  </span><span class="kw">labs</span>(<span class="dt">title =</span> <span class="st">&#39;A Mixed Migration: Suburbs &amp; Sunshine&#39;</span>, </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a>       <span class="dt">subtitle =</span> <span class="st">&#39;A multi-generational migration is underway in the United States--Baby Boomers across the northeast seek sunshine for their golden years,</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a><span class="st">while Millenials make their long-awaited transition to the suburbs! More than 121,000 people migrated to Florida from Maine, New York, </span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true"></a><span class="st">Pennsylvania, and Texas in 2018--the top destination of movers from those states (collectively). Meanwhile the transition to the suburbs is </span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true"></a><span class="st">clearly evident with the move of 64,800 people moved from New York to New Jersey, the top destination for migrants from New York.&#39;</span>)</span></code></pre></div>
+<p><img src="networks_files/figure-html/plot-generation-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

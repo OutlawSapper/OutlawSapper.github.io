@@ -1,0 +1,53 @@
+---
+title: "Other Academic Work"
+---
+
+<em> This section highlights research conducted (and the relevant techniques employed) during the course of graduate studies at Georgetown University. </em>
+
+### [Tweeting Democracy!](https://github.com/OutlawSapper/ANLY580_Project2/tree/master)
+<em> Project for ANLY-580: Natural Language Processing </em>
+<br>
+Twitter has evolved into a key platform for modern politics – offering politicians a fast and efficient way to communicate their message to the general public. By looking at the tweets made by seven major Democratic Party Presidential Nominee hopefuls,  we sought to better understand how the candidates used this evolving platform to engage Americans.
+<br>
+**Techniques Used**: API Interfacing, Natural Language Processing, Authorship Detection, Supervised Machine Learning, Topic Modelling, and Visualization Generation. 
+
+### [Understanding Cancer Rates in America](http://tpm.georgetown.domains/scholarship/)
+
+<em> Project that accompanied a competitive ‘2nd Year Scholarship’ application.</em>
+<br>
+Twitter has evolved into a key platform for modern politics – offering politicians a fast and efficient way to communicate their message to the general public. By looking at the tweets made by seven major Democratic Party Presidential Nominee hopefuls,  we sought to better understand how the candidates used this evolving platform to engage Americans.
+<br>
+**Techniques Used**: Data Wrangling, Statistical Analysis & Hypothesis Testing, Regression Analysis, Supervised Machine Learning, and Interactive Visualization Generation. 
+
+### [An Exploratory and Predictive Look at Traffic Incidents in Montgomery County, Maryland](products/ANLY512_ProjectPaper_Final Submit.pdf)
+
+<em> Project for ANLY-512: Statistical and Machine Learning </em>
+<br>
+Law enforcement officers are entrusted with great responsibility and discretion as their duties involve them operating unsupervised, with fleeting public oversight at best. As a result, an officer’s effectiveness is largely dependent upon the trust that they, and their fellow officers, have built with the community. While challenging and time-consuming to understand individual decision-making processes, the Montgomery County (Maryland) Traffic Dataset allows for an aggregated look at how this police-force—collectively—makes decisions and builds that trust.
+<br>
+**Techniques Used**: Data Wrangling, Traditional Statistics, Unsupervised and Supervised Machine Learning (involving hyper-parameter tuning), and model visualiztion.
+
+### [Admissions Process Analysis](http://tpm.georgetown.domains/ANLY599-1/admissions-process-analysis/)
+
+<em> Project for ANLY-599: Storytelling & Decision Science </em>
+<br>
+This research explores a fictional set of admissions data in order to provide the university executives with a comprehensive review of the university’s admissions process and decision making. 
+<br>
+**Techniques Used**: Data Wrangling, Statistical Analysis & Hypothesis Testing, Regression Analysis, Unsupervised Machine Learning, and Interactive Visualization Generation. 
+
+### [Media Influence on NBA Player Performance](http://douglaspost.georgetown.domains/finalproject501/)
+
+<em> Final Project for ANLY 501: Introduction to Data Analytics </em>
+<br>
+This study explores the relationship between the tone and volume of media and public attention with respect to the performance of professional athletes, specifically NBA Players. Using a variety of predictive, descriptive, and diagnostic procedures this research evaluates the plausibility of future research into this topic. That is, the goal of this study is not to present decisive conclusions about the media’s impact on NBA players performance, rather to investigate the relationship between media attention and player performance.
+<br>
+**Techniques Used**: Website Scraping & API Interfacing, Data Wrangling, Statistical Analysis & Hypothesis Testing, Regression Analysis, Supervised and Unsupervised Machine Learning, and Interactive Visualization Generation. 
+
+
+
+
+
+
+
+
+

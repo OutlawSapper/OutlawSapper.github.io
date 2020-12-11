@@ -1,0 +1,957 @@
+---
+title: "DC BAH"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: paper
+    orientation: columns
+---
+<style type="text/css"> body{font-size: 12pt;} </style>
+<style type="text/css"> .sidebar { overflow: auto; } </style>
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(DT)
+library(tidyverse)
+library(magrittr)
+library(stringr)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(tigris)
+library(leaflet)
+library(tidyverse)
+library(ggraph)
+library(tidygraph)
+library(ggmap)
+library(treemapify)
+library(wordcloud2)
+
+## set global conditions
+options(scipen = 999)
+options(tigris_use_cache = TRUE)
+
+## set default ggplot theme
+theme_set(theme_minimal())
+
+## set default kniter theme
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align='center', fig.width = 8, fig.height = 6)
+```
+
+Introduction
+=======================================================================
+
+### A Visual Look at the Basic Allowance for Housing (BAH) in the National Capital Region
+
+Authorized under Section 37 of the United States Code, Basic Allowance for Housing (BAH) is an entitlement provided to service members when adequate housing is not provided or is otherwise unavailable at the individual's current duty station. This compensation, set annually by the Secretary of Defense, is meant to cover 95 percent of the service member's housing costs once adjusted for the individual's location of assignment, pay grade (rank), and dependency status. That means that a service member assigned to a duty station near a major metropolitian area can expect to receive more compensation compared to a peer assigned to a more rural area since housing is typically more expensive near cities. Similarly, a more senior service member (by rank, not time in service) would receive a larger monthly payment in an attempt to align this compensation with what a civilain peer would typically pay for housing in the same market. To clarify, see the examples below:
+
+* <strong>Location Difference</strong>. A service member in the O-3 pay grade (that of an Army, Air Force, or Marine Captain) with dependents (spouse and/or children) could expect to receive the following monthly allowance at each location:
+    + Washington, D.C.: $2,859  
+    + New York, NY: $4,281
+    + Fort Riley, KS: $1,470
+    + Colorado Springs, CO: $1,974
+* <strong>Pay Grade Difference</strong>. A service member assigned to the National Capital Region (Washington, D.C. and the surrounding area) could expect the following allowance based on their current rank:
+    + E-3 (Army Private First Class): $2,328  
+    + E-8 (Army Master Sergeant): $2,787
+    + O-3 (Army Captain): $2,859
+    + O-6 (Army Colonel): $3,171
+    
+While every duty station has its own, unique challenges, assignments to the National Capital Region are particularly harsh for many service members who are often unfamiliar and unprepared to live in the nation's sixth largest metropolitan area (Census Bureau). While the seat of the United States government since 1800, and hence a historically common area for service members to be assigned, the area has seen a recent surge in private-sector  development exemplified by Amazon's selection of Crystal City, Virginia as the location for its new HQ2 facility. This move has dramatically increased the demand housing, resulting in low inventory and high costs. Further compounding the issue of appropriate compensation is that the entire national capital region is managed as a single Military Housing Area, meaning that a service member assigned to Capital Hill will receive the same compensation as a service member assigned to Walter Reed National Medical Center (in Bethesda, Maryland) or Fort Belvoir (near Lorton, Virginia) despite vastly different housing costs near each location. Consequently, this visual story will examine the efficacy and fairness of Basic Allowance for Housing (BAH) compensation within the Washington D.C. metro area given a single snapshot of housing availability from Rentals.com.
+<br><br>
+**Written & Designed by**: <em> Thomas P. Malejko </em>
+
+The Data {data-orientation=rows}
+=======================================================================
+
+Row {data-height=125}
+-----------------------------------------------------------------------
+
+### About the Data
+
+The data for this visual story was scraped from Rentals.com on 26 June 2020 and is comprised of 751 rental listings from zip codes that comprise the Washington D.C. Military Housing Area. Forty-four features for each listing, detailed below, were extracted during the scrape, reformatted, and saved to a comma-seperated-value file that is 351 KB in size. 
+
+Row {data-height=875}
+-----------------------------------------------------------------------
+
+```{r load-data}
+## read-in the dataframe
+rentDF <- read_csv('data/RentalScrape.csv')
+
+## load the good zip codes for the analysis
+dcZips <- read_csv('data/BAH_DCZips.csv', col_names = FALSE) %>% 
+  mutate(zipCode = as.character(X1)) %>% 
+  select(zipCode)
+
+## keep only the good records
+rentDF <- rentDF %>% 
+  mutate(zipCode = as.character(zipCode)) %>% 
+  right_join(dcZips, by = c('zipCode' = 'zipCode')) %>% 
+  distinct(listingId, .keep_all = TRUE)
+```
+
+```{r datatable-setup}
+## generate data description table
+names <- colnames(rentDF)
+description <- c('Street Address for the rental listing', 
+  'City of the rental listing',
+  'State of the rental listing',
+  'Zip Code of the rental listing', 
+  'Unique identification value for each rental listing',
+  'Is the listing a paid listing?', 
+  'Latitude and Longitude of the Listing',
+  'Is the listing a "Spotlight" listing?',
+  'Date of the last update to the listing',
+  'Unique identification value for each rental listing', 
+  'Type of rental property (Apartment, Townhome, etc.)',
+  'Highest listed price for the rental listing',
+  'Lowest listed price for the rental listing',
+  'Highest number of listed beds for the rental property',
+  'Lowest number of listed beds for the rental property',
+  'Highest number of listed baths for the rental property',
+  'Lowest number of listed baths for the rental property',
+  'Number of half-baths for the rental property',
+  'Size of the rental property in square feet',
+  'Approximate geographic area for this listing',
+  'Desktop phone number for the listing agent',
+  'Mobile phone number for the lsiting agent',
+  'The listingId(s) for nearby listings',
+  'The neighborhood that the rental property is in',
+  'If the property currently has vacancy',
+  'URL to photos of the proprty',
+  'The name of the property--typically the street address',
+  'The name of the property--typically the street address',
+  'UNKNOWN FIELD',
+  'endecaID(s) for recommended properties',
+  'The revenue to be made on the lease of the property',
+  'The listing source location',
+  'Management Company Name',
+  'Does the listing include a gHD Tour',
+  'Does the listing include a HD Tour',
+  'Does the listing include a HD Tour video walkthrough',
+  'Does the listing include other video walkthrough',
+  'Highest listed price for the rental listing',
+  'Lowest listed price for the rental listing',
+  'Highest number of listed beds for the rental property',
+  'Lowest number of listed beds for the rental property',
+  'Highest number of listed baths for the rental property',
+  'Lowest number of listed baths for the rental property',
+  'Total properties available at location')
+type <- c('String', 
+  'String', 
+  'String', 
+  'Integer',
+  'String',
+  'Boolean',
+  'String',
+  'Boolean',
+  'Datetime',
+  'String',
+  'String',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'String',
+  'String',
+  'String',
+  'String',
+  'List of Strings',
+  'List of Strings',
+  'Blank',
+  'String',
+  'String',
+  'String',
+  'String',
+  'List of Strings',
+  'String',
+  'String',
+  'String',
+  'Boolean',
+  'Boolean',
+  'Boolean',
+  'Boolean',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer',
+  'Integer')
+
+featDF <- tibble('Name' = names, 'Description' = description, 'dType' = type)
+```
+
+### <em> Dataset Features & Descriptions </em> 
+
+```{r}
+datatable(featDF)
+```
+
+### <em> Dataset Preview (First 5 Columns and 10 Rows) </em> {data-width=650}
+
+```{r reformatDF}
+## convert columns to appropriate dtypes
+rentDF$state %<>% as.factor
+rentDF$zipCode %<>% as.factor
+##fix geocode later in analysis
+rentDF$listingType %<>% as.factor
+rentDF$listingBathHigh %<>% as.factor
+rentDF$listingBathLow %<>% as.factor
+rentDF$listingBedHigh %<>% as.factor
+rentDF$listingBedLow %<>% as.factor
+rentDF$halfBaths %<>% as.factor
+rentDF$tplSource %<>% as.factor
+rentDF$revenue %<>% as.numeric  ##unavailable information coerced to NA
+rentDF <- rentDF %>% mutate(unitSqFt = as.numeric(str_extract(rentDF$unitSqFt, '\\d+'))) 
+```
+
+```{r, fig.align = "center"}
+datatable(head(rentDF, 10)[1:5])
+```
+
+Data Wrangling
+=======================================================================
+
+Before any analysis was conducted, the original and unedited data that was scraped from Rentals.com was cleaned and reformated (better known as "tidied"). The first step of this process was removing extraneous features that consisted of many missing or unique values. Once that was complete, a preliminary review of each feature allowed for better understanding of the data and identify any remaining issues with the data's structure. The final dataset, once cleaned, contained 23 features and 121 records. 
+
+Column {data-width=500, .tabset}
+-----------------------------------------------------------------------
+### <em> Missing Data Cleaning </em>
+
+```{r explore-plot1}
+## plot missing values
+naniar::gg_miss_var(rentDF, show_pct = TRUE)$data %>% 
+  filter(pct_miss > 0) %>% 
+  arrange(desc(pct_miss)) %>% 
+  mutate(variable=fct_reorder(variable, pct_miss)) %>% 
+  mutate(pct_miss = pct_miss / 100) %>% 
+  ggplot(aes(x = variable, y = pct_miss)) +
+  geom_point() +
+  geom_segment(aes(x = variable, xend = variable, y = 0, yend = pct_miss)) +
+  scale_y_continuous(labels = scales::percent, expand = c(.005, .005)) +
+  scale_x_discrete(expand = c(.02, .02)) +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  xlab('Feature Name') +
+  ylab('Percent of Missing Values') +
+  labs(title = '15% of Features Have More Than Half of Values Missing', 
+       subtitle = 'While 15 percent of the features in the dataset are missing at least half of their records,\n70 percent of features have no missing values.') +
+  coord_flip()
+```
+
+>Of the 44 features in the dataset, just 30 percent contain any missing values. Of those 13 features, 8--*propertyType, propertyName, noVacancy, aggergates.totalAvailable, mPhone,* *neighborhoods,* and *revenue*--are missing more than 40 percent of their values. Consequently, these features will be dropped from the dataframe before proceeding with the analysis. While *lastUpdate* is also missing more than half of its values, some limited insights may be gained from studying this feature so it will not be removed at this point.
+
+### <em> Understand Missingness </em>
+```{r remove-missing}
+## remove columns w/ excessive missing values
+rentDF <- rentDF %>% 
+  select(-c(propertyType, propertyName, noVacancy, aggregates.totalAvailable,
+            mPhone, neighborhoods, revenue))
+```
+
+```{r understand-rmissing}
+## remove columns w/ excessive missing values
+rentDF %>% 
+  naniar::gg_miss_upset(main.bar.color = 'grey50',
+                        sets.bar.color = 'grey50')
+```
+
+>While the majority of still missing values originate from the *lastUpdate*, *recommendedListings,* and *nearbyListings* columns, these feature may lead to some interesting insights during time-series and network analyses so they cannot be removed. However, any record that is missing at least one value from the remaining columns will be removed. The next step in data wrangling is to identify columns (or features) that are unlikely to contribute insights during the analysis due to singularity (only one value present in the feature) or complete uniqueness (every record has its own value).
+
+### <em> Variable Uniqueness </em>
+```{r remove-missingRecords}
+## remove records with missing values (not in recommendedListings or nearbyListings)
+rentDF <- rentDF %>% 
+  drop_na(c(listingType, mgtCoName, unitSqFt))
+```
+
+```{r plot-uniqueness}
+## get the number of unique items per column, transpose the dataframe, 
+## add a color indicator, and plot!
+rentDF %>% 
+  summarise(across(1:37, n_distinct)) %>% 
+  rownames_to_column %>% 
+  gather(var, value, -rowname) %>% 
+  spread(rowname, value) %>% 
+  mutate(var=fct_reorder(var, `1`)) %>% 
+  mutate(pct_unique = `1`/nrow(rentDF)) %>% 
+  mutate(fillColor = ifelse((pct_unique == 1 | pct_unique <= 1/744) , 'Orange', 'Grey')) %>% 
+  ggplot(aes(x = var, y = pct_unique, fill = fillColor)) +
+  geom_col() +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  scale_fill_manual(values = c('Orange'= '#C41E3A', 'Grey' = 'grey50')) +
+  scale_x_discrete(expand = c(0.01, 0.01)) +
+  scale_y_continuous(labels = scales::percent, expand = c(.005, .005)) +
+  xlab('Feature Name') +
+  ylab('Unique Value Count') +
+  labs(title = 'Identification of Unique and Non-Unique Features...',
+       subtitle = 'Multiple features have either purely unique values or the exact same value (red),\nwhich must be cleaned prior to any technical analysis.') +
+  guides(fill=FALSE) +
+  coord_flip()
+```
+
+>First, this plot shows that the *isPaid* and *isCurrentSpotlight* features are non-unique; that is all values have the exact same value. Additionally, seven columns contain entirely unique values. While a few columns of unique identifiers may be useful--especially for some forms of network analysis--the current number is untenable. By looking at actual values, we know that little analytic value can be derived from the following columns: *propertyLabel*, *photos*, *listingSeoPath*, and *desktopPhone*. Collectively, these six features provide little insight and can be safely removed from the dataframe. \n Additional analysis reveals that the data represented in the features beginning with "listing" are duplicated in the similarly named "aggregates" feature. For example, every record in the *listingBathLow* column perfectly matches that of the *aggregates.baths.low* one. As a result, any column that begins with "aggregrates" will be dropped to eliminate this duplication of information. Similarly, *endecaID* and *listingID* contain duplicated information so only *listingID* will be retained.
+
+Column {data-width=500, .tabset}
+-----------------------------------------------------------------------
+```{r remove-uniqueFeatures}
+## remove records with missing values (not in recommendedListings or nearbyListings)
+rentDF <- rentDF %>% 
+  select(!c(isPaid, isCurrentSpotlight, propertyLabel, photos, listingSeoPath, desktopPhone, aggregates.prices.low, aggregates.prices.high,
+aggregates.beds.low, aggregates.beds.high, aggregates.baths.low,
+aggregates.baths.high, endecaId))
+```
+
+### <em> Factor Features </em>
+
+```{r understand-FactorData}
+## filter to only the factor columns
+fctCols <- rentDF %>% 
+  select_if(function(x){is.factor(x)}) %>% 
+  colnames()
+
+## remove zipCode...just too many
+fctCols <- fctCols[!fctCols %in% 'zipCode']
+
+## intialize an empty list to store plots
+plotList <- list()
+
+## generate the plot for each factor feature and append to the list
+for(col in fctCols){
+  p <- ggplot(rentDF, aes_string(x = col)) +
+    geom_bar(stat = 'count', fill = 'grey50') +
+    theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+    ylab('Value Count') +
+    scale_x_discrete(expand = c(0.01, .01)) +
+    scale_y_continuous(expand = c(.01, .01)) +
+    labs(title = paste('Value Counts in', col)) +
+    coord_flip()
+  
+  plotList[[col]] <- p
+}
+
+##generate the plot
+grid.arrange(grobs = plotList, ncol = 2)
+```
+
+>Before any commentary can be made about the feature plot above, it is clear that the data still needs some cleaning as evidenced by the presence of a rental property in Vermont (state = 'VT') in the dataframe. While most likely a typo, this record will be dropped from the dataframe as a precaution since other features of this record may have been incorrectly entered as well. This analysis also shows a stark difference between the number of beds and baths available in the 'high' to the 'low' features. This is likely a feature of Rentals.com for apartment complexes where listing agents can post a single listing but for multiple apartments that range in size between 1-3 bedrooms and 1-2 bathrooms. To confirm that this is solely a feature of apartment listings, the next chart was generated.
+
+### <em> Feature Mismatch </em>
+
+```{r filter-State}
+## ensure that only Virginia, Maryland, and DC listings are in the feature space
+rentDF <- rentDF %>% filter(state %in% c('VA', 'MD', 'DC'))
+```
+
+```{r understand-mismatch}
+## convert the features in question back to integers for easier comparison
+rentDF$listingBathHigh <- as.integer(as.character(rentDF$listingBathHigh))
+rentDF$listingBathLow  <- as.integer(as.character(rentDF$listingBathLow))
+rentDF$listingBedHigh  <- as.integer(as.character(rentDF$listingBedHigh))
+rentDF$listingBedLow   <- as.integer(as.character(rentDF$listingBedLow))
+
+## generate a temporary dataframe for feature mismatch
+tempDF <- rentDF %>% 
+  select(listingBathHigh, listingBathLow, listingBedHigh, listingBedLow, halfBaths, listingType) %>% 
+  mutate(bathMis = listingBathHigh != listingBathLow) %>% 
+  mutate(bedMis =  listingBedHigh != listingBedLow) 
+
+## recode the labels for easier viewing
+tempDF$listingType <- recode(tempDF$listingType, 'Houses And Homes' = 'Houses', 'Townhouses And Condos' = 'Townhome/Condo')
+
+## generate the two plots and plot via a single grob
+p1 <- ggplot(tempDF, aes(x = listingType, fill = bathMis)) +
+  geom_bar(stat = 'count') + 
+  scale_fill_manual(values = c('grey50', '#C41E3A'), name = 'Feature\nMismatch') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  scale_x_discrete(expand = c(0.25, 0.01)) +
+  scale_y_continuous(expand = c(.01, .01)) +
+  xlab('Listing (Property) Type') + 
+  ylab('Count') +
+  labs(title = "Apartments Account For Every\nBathroom Count Mismatch")
+
+p2 <- ggplot(tempDF, aes(x = listingType, fill = bedMis)) +
+  geom_bar(stat = 'count') + 
+  scale_fill_manual(values = c('grey50', '#C41E3A'), name = 'Feature\nMismatch') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  scale_x_discrete(expand = c(0.25, 0.01)) +
+  scale_y_continuous(expand = c(.01, .01)) +
+  xlab('Listing (Property) Type') + 
+  ylab('Count') +
+  labs(title = "Apartments Account For Most Every\nBedroom Count Mismatch")
+  
+# grid.arrange(p1, p2, ncol = 2)
+ggarrange(p1, p2, ncol = 2)
+```
+
+>Since more than 99 percent of the cases where a listing has different values for the number of bedrooms or bathrooms available are for apartment listings, it is clearly a feature designed to make advertising apartments in large complexes easier. Unfortunately, this sort of data makes analysis very difficult and, as a result, any record that has this feature will be removed. This also allows for a cleaner dataframe where there is only one feature representing the the number of bedrooms, bathrooms, etc.
+
+### <em> Numeric Features </em>
+
+```{r remove-mismatch}
+## remove records with mismatching values
+rentDF <- rentDF %>% 
+  mutate(mismatch = (listingBathHigh != listingBathLow | listingBedHigh != listingBedLow)) %>% 
+  filter(mismatch != TRUE) %>% 
+  select(!c(mismatch))
+
+## rename the bedroom, bathroom, and price columns
+rentDF <- rentDF %>% 
+  rename(listingBed = listingBedHigh) %>% 
+  rename(listingBath = listingBathHigh) %>% 
+  rename(listingPrice = listingPriceHigh) %>% 
+  select(!c(listingBathLow, listingBedLow, listingPriceLow))
+```
+
+```{r understand-numeric}
+## generate the plot
+rentDF %>%
+  # filter(listingPrice < 10000) %>%
+  ggplot(aes(unitSqFt, listingPrice)) +
+  geom_point(color = 'grey50') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  # xlim(0, 4000) +
+  scale_y_continuous(label = scales::dollar) +
+  xlab('Unit Size (Square Feet)') +
+  ylab('Unit Price') +
+  labs(title = 'Reasonable Numeric Features',
+       subtitle = 'While the cost of some rentals may appear unaffordably high, they are within the realm possible for a service member provided that their spouse also works.')
+```
+
+>There appear to be no outliers in the numeric features that would impact future analysis. 
+
+Exploratory
+================================
+
+With the data fully cleaned, a more thorough review of the features and variables can begin. Since the visual story seeks to understand the how realistic the Basic Allowance for Housing (BAH) compensation is for service members assigned to the Washington, D.C. Metro area, the exploratory analysis will principally look at how the various features in the dataset effect the rental property's monthly price.
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### <em> Cost Per Square-Foot </em>
+
+```{r}
+## recode the listingType column for better plotting results
+rentDF$listingType <- recode(rentDF$listingType, 'Houses And Homes' = 'Houses', 'Townhouses And Condos' = 'Townhome/Condo')
+```
+
+```{r cost-sqft-plot}
+## understand the cost per square foot
+rentDF %>%
+  ggplot(aes(unitSqFt, listingPrice, color = listingType)) +
+  geom_density_2d(size = .60, bins = 11) +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10"), legend.justification=c(1,1), legend.position=c(1,1)) +
+  scale_y_continuous(label = scales::dollar) +
+  scale_color_manual(values = c('grey50', '#89CFF0', '#055a8c'), name = 'Property Type') +
+  xlab('Unit Size (Square Feet)') +
+  ylab('Unit Price (Monthly)') +
+  labs(title = 'Bigger Property, Bigger Monthly Payment (Sort Of)',
+       subtitle = 'With the exception of rental apartments--which clearly have a different pricing strategy--\nthe larger rental properties (as determined by interior square footage) generally cost $60\nmore per month for each additional 100 square feet.')
+```
+
+>With the exception of apartments, which have a clear tri-modal pricing strategy that is likely location-dependent (and will be investigated in the geospatial analysis), the average monthly rent increases by nearly $60 for every additional 100 square feet of interior space provided that other features remain constant. This is an unsurpising finding for those familiar with real estate, but a finding that bears further consideration during this analysis because as a service member becomes more senior (higher rank) they are expected to reside in larger housing. For example, a Captain in the United States Army (O-3) with dependents is anticipated to live in a 3-bedroom townhome while a Major (O-4) is expected to reside in a 3-bedroom single family residence. Given that the difference in BAH compensation between the two is $168 that would equate a difference in square footage of 280 square-feet (which is equates to the addition of a 20 feet x 14 feet room to the residence) which seems in line with the compesation difference.
+
+Column {data-width=500, .tabset}
+-----------------------------------------------------------------------
+### <em> Cost Per Bedroom </em>
+
+```{r bed-cost}
+## understand the cost of rental per bedroom on the listing
+rentDF %>% 
+  ggplot(aes(x = as.character(listingBed), y = listingPrice)) +
+  geom_boxplot(fill = '#055A88') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10"),
+        legend.justification=c(1,1), legend.position=c(1,1)) +
+  xlab('Number of Bedrooms') +
+  ylab('Unit Price') +
+  scale_y_continuous(label = scales::dollar) +
+  facet_wrap(~listingType) + 
+  labs(title = 'Who Needs All That Space...',
+       subtitle = 'The number of bedrooms in a rental property appears to have little impact on list price,\nespecially for smaller residences (0-2 Bedrooms).')
+```
+
+> Each additional bedroom increases the rental price by $194 (not including apartments), which is surprisingly low. This indicates that another factor (likely location) plays an important role in determining the overall value of a rental property.
+
+### <em> Cost Per Bathroom </em>
+```{r bed-cost-box}
+## understand the cost of rental per bedroom on the listing
+rentDF %>% 
+  ggplot(aes(x = as.character(listingBath), y = listingPrice)) +
+  geom_boxplot(fill = '#055A88') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10"),
+        legend.justification=c(1,1), legend.position=c(1,1)) +
+  xlab('Number of Bathrooms') +
+  ylab('Unit Price') +
+  scale_y_continuous(label = scales::dollar) +
+  facet_wrap(~listingType) +
+  labs(title = 'The Surprising Cost of Additional Bathrooms',
+       subtitle = 'For comparable properties, each additional bathroom increases the average rental cost by \n$137 for all unit types and nearly $558 for non-apartments!')
+```
+
+>In non-apartment rental units, the effect of an additional bathroom on the unit's afforability is surprising! For comparable properties, each additional bathroom increases the average rental price by nearly $558, which is 65 percent more than the effect of each additional bedroom on the rental property's list price. 
+
+Geospatial {data-orientation=rows}
+================================
+
+Row {data-height = 900}
+-----------------------------------------------------------------------
+
+### <em> 3-4 Bedroom Rentals </em>
+
+```{r get-zipData}
+## get the zip code boundary data from the web (takes time to run) for the NCR Region zip codes
+char_zips <- zctas(cb = TRUE, starts_with = c('20', '22', '56'))
+```
+
+```{r prep-data}
+## generate two sub-DFs for analysis...1 for 3-4 bedroom rentals and 1 for 0-2 bedroom rentals
+## to roughly approximate the housing options for a mid-grade officer and junior enlisted soldier
+O3DF <- rentDF %>% 
+  filter(listingBed >= 3 & listingBed <=4) %>% 
+  group_by(zipCode) %>% 
+  summarise(meanRent = mean(listingPrice), stdDev = sd(listingPrice), numList = n())
+
+E4DF <- rentDF %>% 
+  filter(listingBed >= 0 & listingBed <= 2) %>% 
+  group_by(zipCode) %>% 
+  summarise(meanRent = mean(listingPrice), stdDev = sd(listingPrice), numList = n())
+
+## generate the color palette breaks and labels for both DF
+O3breaks <- c(min(O3DF$meanRent), 1900, 2300, 2700, 2859, 3070, 3470, 3870, max(O3DF$meanRent))
+O3labs   <- c('$1700-$1900', '$1901-$2300', '$2301-$2700', '$2701-$2859',
+              '$2860-$3070', '$3071-$3470', '$3471-$3870', '$3871-$5100')
+
+E4breaks <- c(min(E4DF$meanRent), 964, 1501, 2039, 2577, 3115, 3653, 4191, max(E4DF$meanRent))
+E4labs   <- c('$425-$963', '$964-$1501', '$1502-$2039', '$2040-$2577',
+              '$2578-$3115', '$3116-$3653', '$3654-$4191', '$4192-$4732')
+
+#create breaks for better graphic plotting
+O3DF$brks <- cut(O3DF$meanRent, breaks = O3breaks, labels = O3labs)
+E4DF$brks <- cut(E4DF$meanRent, breaks = E4breaks, labels = E4labs)
+```
+
+```{r gen-O3map}
+#join the dataframes with the map data
+zips <- geo_join(char_zips, O3DF, by_sp = 'GEOID10',
+                  by_df = 'zipCode', how = 'inner')
+
+##initialize variables and conditions for mapping
+pal <- colorFactor(palette = 'Spectral', domain = zips$brks,
+                   reverse = TRUE)
+
+labels <- paste0('Zip Code: ', zips@data$GEOID10, "<br>",
+                 'Mean List Price: ', scales::dollar(zips@data$meanRent), "<br>",
+                 'Std Dev Price: ', round(zips@data$stdDev, 0), "<br>",
+                 'No. of Listings: ', zips@data$numList) %>% 
+  lapply(htmltools::HTML)
+
+##create the map
+zips %>% 
+  leaflet %>% 
+  #add base map
+  addProviderTiles('CartoDB') %>% 
+  #add zip codes
+  addPolygons(fillColor = ~pal(brks), weight = 1.5, opacity = 1,
+              color = '#F2F3F3', dashArray = '2', fillOpacity = .75,
+              highlight = highlightOptions(weight = 2, color = '#666', 
+                                           dashArray = '', fillOpacity = .7,
+                                           bringToFront = TRUE),
+              label = labels) %>% 
+  #add legend
+  addLegend(pal = pal, values = ~brks, opacity = .7, 
+            title = htmltools::HTML('Mean Price For<br>
+                                    3-4 Bed Rental<br>
+                                    in NCR BAH Region<br>'),
+            position = 'bottomright') 
+```
+
+### <em> 0-2 Bedroom Rentals </em>
+
+```{r gen-E4map, fig.height = 10}
+#join the dataframes with the map data
+zips <- geo_join(char_zips, E4DF, by_sp = 'GEOID10',
+                  by_df = 'zipCode', how = 'inner')
+
+##initialize variables and conditions for mapping
+pal <- colorFactor(palette = 'Spectral', domain = zips$brks,
+                   reverse = TRUE)
+
+labels <- paste0('Zip Code: ', zips@data$GEOID10, "<br>",
+                 'Mean List Price: ', scales::dollar(zips@data$meanRent), "<br>",
+                 'Std Dev Price: ', round(zips@data$stdDev, 0), "<br>",
+                 'No. of Listings: ', zips@data$numList) %>% 
+  lapply(htmltools::HTML)
+
+##create the map
+zips %>% 
+  leaflet %>% 
+  #add base map
+  addProviderTiles('CartoDB') %>% 
+  #add zip codes
+  addPolygons(fillColor = ~pal(brks), weight = 1.5, opacity = 1,
+              color = '#F2F3F3', dashArray = '2', fillOpacity = .75,
+              highlight = highlightOptions(weight = 2, color = '#666', 
+                                           dashArray = '', fillOpacity = .7,
+                                           bringToFront = TRUE),
+              label = labels) %>% 
+  #add legend
+  addLegend(pal = pal, values = ~brks, opacity = .7, 
+            title = htmltools::HTML('Mean Price For<br>
+                                    1-2 Bed Rental<br>
+                                    in NCR BAH Region<br>'),
+            position = 'bottomright') 
+```
+
+Row {data-height = 100}
+-----------------------------------------------------------------------
+### Geospatial Interpretations
+
+What is clear from this geospatial analysis is the general lack of rental properties available. While this data pull represents a single point in time, one would expect greater availability during the 'peak move' season. This is particularly true for 3-4 bedroom rentals, where only 10 properties were available for rent at this point in time. Furthermore, given that the Basic Allowance for Housing (BAH) for individuals expecting to reside in 3-4 bedroom townhomes and single family homes is between \$2,556 (E-6) and \$3,171 (O-6) per month there is a clear lack of housing west of Washington D.C. in that price range, especially in close proximity of the Pentagon and other downtown assignments. Given that most residents of suburban communities in this area are dual-income, something that is often untenable for service member families due to the frequent moves, it seems that more should be done to ensure that service members are able to locate and afford appropriate housing near their Washington D.C. duty station.
+
+Network
+================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Nearby Listings by Locale
+
+```{r prep-network}
+## isolate the nearby listings and listingId information from the original 
+## data frame
+tempDF <- rentDF %>% 
+  select(listingId, nearbyListings) %>% 
+  filter(!is.na(nearbyListings))
+
+## reformat the nearbyListings feature and pivot on the listingId 
+## (multiple nearbyListings for each listingId)
+tempDF$nearbyListings <- gsub('\\[|\\]', '', tempDF$nearbyListings)
+
+## build the node dataframe, saving the listingId and splitting the geoCode
+## into lat and long information
+nodes <- rentDF %>% select(listingId, geoCode, listingPrice) %>%
+  separate(geoCode, sep = ',', into = c('Lat', 'Long')) %>% 
+  mutate(y = as.numeric(Lat)) %>% 
+  mutate(x = as.numeric(Long)) %>% 
+  mutate(id = row_number()) %>% 
+  select(id, listingId, x, y, listingPrice)
+
+## build the edge list
+edges <- tempDF %>%
+  separate(nearbyListings, into=c('a', 'b', 'c', 'd', 'e', 'f')) %>% 
+  pivot_longer(cols = a:f, names_to = 'junk') %>%
+  select(listingId, value) %>%
+  filter(!is.na(value)) %>%
+  filter(value != '') %>%
+  rename(source = listingId, target = value)
+
+## convert the node information into the edge list into a numeric representation
+## first with the sourceList, then the targetList
+edges <- edges %>% 
+  left_join(nodes[,c(1,2)], by = c('source' = 'listingId')) %>% 
+  rename(sourceId = id)
+
+edges <- edges %>% 
+  left_join(nodes[,c(1,2)], by = c('target' = 'listingId')) %>% 
+  select(source = sourceId, target = id) %>% 
+  filter(!is.na(target))
+
+## convert the nodes and edges into a graph object
+g <- tbl_graph(nodes = nodes, edges = edges, directed = TRUE)
+
+# ggraph(g, layout = 'nicely') +
+#   geom_edge_fan() +
+#   geom_node_point(aes(color = listingPrice)) +
+#   theme_graph()
+```
+
+```{r prep-map}
+## calculate the range for the lat and long
+xRange <- (max(nodes$x) - min(nodes$x))/20
+yRange <- (max(nodes$y) - min(nodes$y))/20
+
+coords <- c(left = min(nodes$x)-xRange, bottom = min(nodes$y)-yRange, right = max(nodes$x)+xRange, top = max(nodes$y)+yRange)
+
+## pull the map from the web
+map <- get_stamenmap(coords, zoom = 10, maptype = 'toner-lite')
+```
+
+```{r plot-network}
+## generate the plot, with the map and base-layer as the ggraph
+ggmap(map, base_layer = ggraph(g, layout = 'nicely')) +
+  geom_edge_fan(color = 'goldenrod', width = .75) +
+  geom_node_point(aes(alpha = listingPrice), color = '#055a8c', stroke = 2, size = 2.5) +
+  theme(legend.justification=c(0,.98), legend.position=c(0,.98), 
+        legend.background = element_rect(fill=alpha('white', 0.90),
+                                         size=0.5, linetype="solid", 
+                                         colour ="grey10")) + 
+  scale_alpha(name = 'Rental Price', label = scales::dollar) +
+  labs(title = "Are 'Nearby Listings' Really Nearby?", 
+       subtitle = "Well--sort of. While the nearby listings are generally in close proximity to\neach other, other listings that may be closer are sometimes not listed as\n'nearby.' Therefore, an additional factor(s) may determine this feature.")
+```
+
+> With every rental property displayed on the network diagram above, it is clear that the majority of listings are located in or near downtown Washington D.C. What is even more clear is how interconnected those downtown listings are, as evidenced by the two listings with the greatest betweeness centrality being apartments located in Washington D.C.. Somewhat surprising, however, was that the node (rental listing) with the greatest degree centrality on the map had just four connections. Additionally, it is clear that additional factors are considered by Rentals.com for a listing to be displayed as a 'Nearby Listing' since many properties, particularly in the western suburbs, are not connected into the larger map despite having a close geographic proximity from other rental properties. This lack of connectivity can increase the challenges faced by service members and their families during their housing search as the number of available properties is limited (as discussed in the next section) and the nearby listings feature does not appear to generate many new leads for those looking to live in Washington D.C.'s western suburbs.
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Nearby Listings by Betweeness
+
+```{r network-2}
+## generate a temporary dataframe without apartments and filter to only the listingIds and nearbyListings
+tempDF <- rentDF %>% 
+  filter(listingType != 'Apartments') %>% 
+  select(listingId, nearbyListings) %>% 
+  filter(!is.na(nearbyListings))
+
+## prepare the nearbylistings column for melting
+tempDF$nearbyListings <- gsub('\\[|\\]', '', tempDF$nearbyListings)
+
+## build the node dataframe, saving the listingId and splitting the geoCode
+## into lat and long information
+nodes <- rentDF %>% select(listingId, address, geoCode, state) %>%
+  separate(geoCode, sep = ',', into = c('Lat', 'Long')) %>% 
+  mutate(y = as.numeric(Lat)) %>% 
+  mutate(x = as.numeric(Long)) %>% 
+  mutate(id = row_number()) %>% 
+  select(id, listingId, x, y, state)
+
+## build edge list
+edges <- tempDF %>%
+  separate(nearbyListings, into=c('a', 'b', 'c', 'd', 'e', 'f')) %>% 
+  pivot_longer(cols = a:f, names_to = 'junk') %>%
+  select(listingId, value) %>%
+  filter(!is.na(value)) %>%
+  filter(value != '') %>%
+  rename(source = listingId, target = value)
+
+## convert the node information into the edge list into a numeric representation
+## first with the sourceList, then the targetList
+edges <- edges %>% 
+  left_join(nodes[,c(1,2)], by = c('source' = 'listingId')) %>% 
+  rename(sourceId = id)
+
+edges <- edges %>% 
+  left_join(nodes[,c(1,2)], by = c('target' = 'listingId')) %>% 
+  select(source = sourceId, target = id) %>% 
+  filter(!is.na(target))
+
+## convert the nodes and edges into a graph object, calculate the betweeness and plot
+tbl_graph(nodes = nodes, edges = edges, directed = TRUE) %>%
+  activate(nodes) %>% 
+  mutate(Betweeness = centrality_betweenness()) %>% 
+  ggraph(layout = 'nicely') +
+  geom_edge_fan() +
+  geom_node_point(aes(size = Betweeness, color = state)) +
+  # theme_graph() +
+  theme(legend.justification=c(0,.98), legend.position=c(0,.98)) +
+  guides(color = guide_legend(override.aes = list(size = 5))) +
+  scale_color_manual(values = c('DC' = '#E91436', 'MD' = '#EAAB00', 
+                                'VA' = '#00297B'),
+                     name = 'Rental State') +
+  scale_size(guide = FALSE) +
+  labs(title = 'Nearby Listings Lead East!',
+       subtitle = "The rental listings with the greatest betweeness (node size) largely exist inside of\nWashington D.C. and Eastern Maryland.") 
+```
+
+> The issue of limited availability and recommended rental properities for Virginia suburbs is made even more clear once apartments (a realistic decision considering most service members and their families do not desire to live in an apartment) are removed from the network diagram. In fact, most rental properties in Virgnia are not tied into (or barely tied into) the larger rental property network. This is not the case for properties in Maryland (either northwest, northeast, or east of the city)! This is especially problematic as many military bases are located west of the city.
+
+Time Series
+=================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+### <em> Updates to Listings by Date </em>
+
+```{r prep-time}
+## create a timeseries formatted dataframe for 
+## easier manipulation
+timeDF <- rentDF %>% 
+  filter(!is.na(lastUpdate)) %>% 
+  ## convert the date/time object to EDT (local time zone)
+  mutate(lastUpdate = as.POSIXct(format(lastUpdate, tz = 'America/New_York', usetz = TRUE))) %>% 
+  ## separate the date
+  mutate(dateUpdate = as.Date(lastUpdate)) %>% 
+  ## separate the hour
+  mutate(hourUpdate = format(lastUpdate, '%H'))
+```
+
+```{r time-1}
+## create a summary DF for date of last updates
+timeDF %>% 
+  ## get the updates per day
+  group_by(dateUpdate) %>% 
+  summarise(count = n()) %>% 
+  ## get the fill information
+  mutate(color = ifelse(dateUpdate > as.Date('2020-06-14'), 'Blue', 'Grey')) %>% 
+  ## generate the plot
+  ggplot(aes(dateUpdate, count, fill = color)) +
+  geom_col() + 
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10")) +
+  scale_x_date(date_breaks = '3 days', date_labels = '%d-%B') +
+  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_fill_manual(values = c('Blue' = '#055a8c', 'Grey' = 'grey50')) +
+  xlab('Date of Last Update') +
+  ylab('Number of Listings Updated') +
+  labs(title = 'Sporadic Updates to Listings',
+       subtitle = 'More than 80 percent of updates made to rental listings occured after the second week of June (blue),\nwhich likely corresponds to the end of the academic year in the area') +
+  guides(fill = FALSE)
+```
+
+>As to be expected the number of updates being made to rental listings begins to spike in middle-to-late June, following the end of the local school year. This aligns with the 'peak move' season, when the majority of people seek to complete their moves as to minimize the disruption to their childrens' education. That said, the overall inventory appears exceptionally low for such a densely populated area. Curiously, no factor could be account for the two large spikes seen on 15 June and 26 June. 
+
+Column {data-width=500, .tabset}
+-----------------------------------------------------------------------
+### <em> Updates by Weekday </em>
+
+```{r time-Pie}
+## create a temporary dataframe to create the breaks and labels
+temp <- timeDF %>% 
+  group_by(dateUpdate) %>% 
+  mutate(DOW = weekdays(dateUpdate)) %>% 
+  group_by(DOW) %>% 
+  summarise(count = n())
+
+## create the breaks and labels for a clean plot
+breaks <- cumsum(rev(temp$count)) - rev(temp$count)/2
+labels <- rev(temp$DOW)
+
+## generate the data by summarising by weekday and plotting
+timeDF %>% 
+  group_by(dateUpdate) %>% 
+  mutate(DOW = weekdays(dateUpdate)) %>% 
+  group_by(DOW) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes('', count, fill = DOW)) +
+  geom_col(width = 1, color = 'grey90') +
+  coord_polar('y', start = 0) +
+  scale_y_continuous(breaks = breaks,
+                     labels = labels) +
+  scale_fill_manual(values = c('#055a8c', '#055a8c', 'grey50', 'grey50', 'grey50', 'grey50', 'grey50')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        panel.border = element_blank(),
+        panel.grid=element_blank(),
+        axis.ticks = element_blank()) +
+  guides(fill = FALSE) +
+  labs(title = 'Mondays & Fridays: The Days of Updates',
+       subtitle = 'Of the 115 listings that included an update, 77 percent occured on a Monday or Friday.')
+```
+
+> Unsurprisingly, 93 percent of updates to rental listings occured during weekdays with 77 percent of updates occuring on Mondays and Fridays. Even controlling for the large spikes--which occured on a Monday and Friday--those days of the weeks are still the most active for updating property listings.
+
+### <em> Updates by Property Type </em>
+
+```{r DOW-Type-Plot}
+## generate the summarized data by DOW and listing type, then plot
+timeDF %>% 
+  mutate(DOW = weekdays(dateUpdate)) %>% 
+  group_by(DOW, listingType) %>% 
+  summarise(count = n()) %>% 
+  mutate(DOW = factor(DOW, levels = c('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'))) %>% 
+  ggplot(aes(DOW, count, fill = listingType)) +
+  geom_col() +
+  scale_y_continuous(expand = c(0.005, 0.005)) +
+  scale_fill_manual(values = c('Apartments' = '#89CFF0', 'Houses' = '#055A88', 'Townhome/Condo' = 'grey50'), 
+                    name = 'Property Type') +
+  theme(panel.grid = element_blank(), axis.line = element_line(color = "grey10"),
+        legend.position = 'top', legend.justification = 'left',
+        legend.direction="horizontal") +
+  xlab('Day of the Week') +
+  ylab('Number of Listings Updated') +
+  labs(title = 'Updates May Vary!',
+       subtitle = 'More than 70 percent of apartments are listed on Mondays, about 67 percent of houses are updated on Fridays.')
+```
+
+> For those familiar with the housing market in the Washington D.C. area, it is no surprise that most updates to listings for single family homes occur on Thursdays and Fridays. This is to ensure that the most current information is available to consumers prior to open houses over the weekend, where agents expect to receive multiple offers thereby taking the house off the market by Monday morning. This real estate tactic reveals how competitive the housing market in the region is, which disadvantages service members and their families during their search for new accomodations as they often have to compete remotely (still at their old duty station) or upon just showing up to the area and unfamiliar with the competitive market.
+
+Text
+================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### The Streets of Rental Properties
+
+```{r text-prep}
+## intialize variables to record information from loop
+numCount <- 0
+aveCount <- 0
+plCount  <- 0
+ctCount  <- 0
+stCount  <- 0
+drCount  <- 0
+otCount  <- 0
+
+## for each record extract the type of street that the listing is on
+for (row in seq(1:nrow(rentDF))){
+  ## isolate the current address
+  address <- rentDF[row, 'address']
+  ## perform a dirty tokenization
+  tokens  <- strsplit(tolower(address), " ")[[1]]
+  
+  ## extracts numbered and lettered streets
+  if (str_detect(address , '\\d+[a-z][a-z]') | str_detect(address , '[a-z] st|rd|nd|th|street')) {
+    numCount <- numCount + 1
+  }
+  else if ('ave' %in% tokens | 'avenue' %in% tokens){aveCount <- aveCount + 1}
+  else if ('pl' %in% tokens | 'place' %in% tokens){plCount <- plCount + 1}
+  else if ('ct' %in% tokens | 'court' %in% tokens){ctCount <- ctCount + 1}
+  else if ('st' %in% tokens | 'street' %in% tokens){stCount <- stCount + 1}
+  else if ('dr' %in% tokens | 'drive' %in% tokens){drCount <- drCount + 1}
+  else {otCount <- otCount + 1}
+}
+
+## reformat the data into a dataframe
+group <- c("Number/Letter Streets","Avenues","Places", "Courts", "Streets", "Drives", "Other Types")
+value <- c(numCount, aveCount, plCount, ctCount, stCount, drCount, otCount)
+color <- c('blue', 'blue', 'grey', 'grey', 'grey', 'grey', 'grey')
+temp <- data.frame(group,value,color)
+```
+
+```{r tree-plot}
+## generate a treemap for the plot
+ggplot(temp, aes(area = value, label = group, fill = color)) +
+  geom_treemap() +
+  scale_fill_manual(values = c('blue' = '#055A88', 'grey' = 'grey50')) +
+  geom_treemap_text(fontface = 'italic', color = 'white', place = 'center') +
+  guides(fill = FALSE) +
+  labs(title = 'Busy Streets Rule the Housing Market',
+       subtitle = 'Nearly 50 percent of rental listings in the NCR have a street address assocaited with a numbered street or avenue.')
+```
+
+>Nearly 50 percent of rental listings in the National Capital Region exist on Numbered or Lettered Streets (i.e. 14th Street NW or P St) and Avenues, which is a marked difference for many military personnel moving to the area. Most military members, especially those in the Army, are accustomed to quiet-suburban living and often struggle to adapt to living in a major metropolitian area. 
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### <em> Home Cost by Location (Roll Over Me) </em>
+
+```{r cloud-2}
+## subset the data for single family homes
+temp <- rentDF %>% 
+  filter((listingType != 'Apartments' & listingBed > 3)) %>% 
+  select(city, listingPrice) %>% 
+  group_by(city) %>% 
+  summarise(avg = mean(listingPrice))
+
+## generate the word cloud
+wordcloud2(temp, size = .25, shuffle = FALSE, shape = 'square')
+```
+
+> This word cloud cleverly displays the average cost of a three bedroom and larger townhomes and single-family-homes in various towns in the Washington D.C. metropolitian area. The size of each city is generated by the average cost of a rental property therein, so larger text corresponds to a higher monthly payment. <em> Scroll over each town to see the average monthly rent in each town. Note, if it fails to display try refreshing your web browser to reactivate the HTML widget. </em>
+
+
+References
+================================
+All data was scraped with gratitude from: <br>
+https://www.rentals.com/ <br><br>
+
+Other supporting information was gathered from:<br>
+https://www.defensetravel.dod.mil/Docs/perdiem/BAH-Primer.pdf<br>
+https://www.law.cornell.edu/uscode/text/37/403#<br>
+https://www.washingtonpost.com/business/2019/10/24/rising-rents-not-easing-dc-area/ <br><br>
+
+Network Diagram w/ Map Underlay Based Upon: <br>
+https://lookatthhedata.netlify.app/2017-11-12-mapping-your-oyster-card-journeys-in-london-with-tidygraph-and-ggraph/
+
