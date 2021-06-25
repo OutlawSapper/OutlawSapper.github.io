@@ -10,6 +10,9 @@ title: "Favorite Visualizations"
 
 <em> A custom word cloud (created using Python), depicting the tweets of the seven most prominent 2020 Democratic presidential hopefuls from the start of the main campaign season to Super Tuesday. Each stripe represents a single candidate’s tweets and the blue field is the field combined. Can you guess which stripe belongs to a candidate (answers at the bottom of the page). </em>
 
+![](images/clausjom.png)
+<em> Wordclouds depicting the consequential words used by Clausewitz (left) and Jomini (right) in On War and The Art of War, respectively.</em>
+
 ### Interactive Network Diagram
 
 ```{r network-prep, echo = FALSE, warning = FALSE, message = FALSE, results='hide'}

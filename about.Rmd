@@ -8,6 +8,7 @@ Ten years of military experience with two deployments to Afghanistan and other o
 
 ### **Professional Awards & Recognition**
 
+* Distinguished Graduate (Top 10%) of Intermediate Level Education (ILE) Course
 * Summer 2017 Best Practice Article Award: Center for Army Lessons Learned (Best Practice: Fighting the Analog War…Again)
 * National Training Center Trainer of Rotation 14-09
 * Engineer Captains Career Course 14-01 Combined Arms Tactics Awardee
@@ -17,9 +18,9 @@ Ten years of military experience with two deployments to Afghanistan and other o
 
 ### **Skills & Experiences**
 
-**Proficient Computer Languages/Tools**: Python | R | PySpark | Tableau | Excel | PowerPoint
+**Proficient Computer Languages/Tools**: Python | R | PySpark | Excel | PowerPoint
 
-**Familiar Computer Languages/Tools**: HTML | SQL | Hadoop | AWS Cloud Computing (EMR, EC2, S3)
+**Familiar Computer Languages/Tools**: HTML | SQL | Hadoop | AWS Cloud Computing (EMR, EC2, S3) | Tableau
 
 ### **Additional Skills**:
 

@@ -1,8 +1,14 @@
 ---
-title: "Other Academic Work"
+title: "Academic Research & Other Professional Work"
 ---
 
-<em> This section highlights research conducted (and the relevant techniques employed) during the course of graduate studies at Georgetown University. </em>
+<em> This section highlights research conducted (and the relevant techniques employed) during the course of studies at Georgetown University and other academic institutions. </em>
+
+### [Clausewitz v. Jomini](products/Clausewitz_Jomini_Paper.pdf)
+Western civilization loves a good rivalry, so much so that societies will create an antagonistic relationship—whether one truly existed or not—just to debate the subject: John Locke v. Thomas Hobbes; Alexander Hamilton v. Aaron Burr; Thomas Edison v. Nikola Tesla; and, of course, *Carl von Clausewitz v. Antoine-Henri Jomini*. However, these assessments of intellectual polarity are the subject of human opinion and, therefore, bias and fallacy. What would remain of the rivalry if the human was removed from the assessment? How truly different are the intellectual rivals? This is where history and mathematics—another diametric relationship—merge to definitively analyze the prominent writings of the aforementioned renowned military theorists. Using machine learning and natural language processing, this paper explores the similarities and differences between the authors in their preeminent works.
+<br>
+**Techniques Used**: Natural Language Processing, Supervised Machine Learning, Topic Modelling, and Visualization Generation. 
+
 
 ### [Tweeting Democracy!](https://github.com/OutlawSapper/ANLY580_Project2/tree/master)
 <em> Project for ANLY-580: Natural Language Processing </em>
